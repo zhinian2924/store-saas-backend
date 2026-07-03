@@ -99,6 +99,12 @@ public class AuthService {
         return doLogin(user, permissions);
     }
 
+    /**
+     * 登录
+     * @param user 用户
+     * @param permissions 权限列表
+     * @return 登录响应
+     */
     private LoginResponse doLogin(SysUser user, List<String> permissions) {
         StpUtil.login(user.getId());
         LoginUser loginUser = new LoginUser(user.getId(), user.getTenantId(), AccountType.valueOf(user.getAccountType()), user.getUsername(), permissions);

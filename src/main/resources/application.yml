@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: store-saas-backend
+  profiles:
+    active: dev
 
 mybatis-plus:
   configuration:

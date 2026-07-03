@@ -23,6 +23,7 @@ public class TenantController {
     @SaCheckPermission("tenant:view")
     @GetMapping
     public ApiResponse<List<Tenant>> list() {
-        return ApiResponse.ok(tenantMapper.selectList(new LambdaQueryWrapper<Tenant>().eq(Tenant::getDeleted, 0).orderByDesc(Tenant::getId)));
+        return ApiResponse.ok(tenantMapper.selectList(new LambdaQueryWrapper<Tenant>()
+                .eq(Tenant::getDeleted, 0).orderByDesc(Tenant::getId)));
     }
 }
