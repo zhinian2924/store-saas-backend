@@ -1,5 +1,11 @@
 package com.example.storesaas.common;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class BusinessException extends RuntimeException {
     private final int code;
 
@@ -10,9 +16,5 @@ public class BusinessException extends RuntimeException {
     public BusinessException(int code, String message) {
         super(message);
         this.code = code;
-    }
-
-    public int getCode() {
-        return code;
     }
 }
