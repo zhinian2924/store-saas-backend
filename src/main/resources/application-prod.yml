@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://prod-host:3306/store_saas?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+
+logging:
+  level:
+    root: warn

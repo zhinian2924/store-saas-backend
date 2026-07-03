@@ -4,14 +4,6 @@ server:
 spring:
   application:
     name: store-saas-backend
-  datasource:
-    url: jdbc:mysql://localhost:3306/store_saas?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
-  data:
-    redis:
-      host: localhost
-      port: 6379
 
 mybatis-plus:
   configuration:
