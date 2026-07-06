@@ -4,6 +4,8 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.auth.dto.LoginRequest;
 import com.example.storesaas.auth.dto.LoginResponse;
 import com.example.storesaas.auth.dto.RegisterTenantRequest;
+import com.example.storesaas.auth.dto.SmsCodeRequest;
+import com.example.storesaas.auth.dto.SmsCodeResponse;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.security.AccountType;
 import jakarta.validation.Valid;
@@ -29,6 +31,11 @@ public class AuthController {
     @PostMapping("/store/login")
     public ApiResponse<LoginResponse> storeLogin(@Valid @RequestBody LoginRequest request) {
         return ApiResponse.ok(authService.login(request, AccountType.STORE));
+    }
+
+    @PostMapping("/store/sms-code")
+    public ApiResponse<SmsCodeResponse> storeSmsCode(@Valid @RequestBody SmsCodeRequest request) {
+        return ApiResponse.ok(authService.sendStoreSmsCode(request));
     }
 
     @PostMapping("/platform/login")

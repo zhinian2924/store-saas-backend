@@ -1,6 +1,4 @@
 package com.example.storesaas.auth.dto;
 
-import jakarta.validation.constraints.NotBlank;
-
-public record LoginRequest(@NotBlank String username, @NotBlank String password) {
+public record LoginRequest(String username, String mobile, String password, String code, String loginType) {
 }

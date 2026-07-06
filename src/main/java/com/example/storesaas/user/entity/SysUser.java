@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 public class SysUser extends BaseEntity {
     private Long tenantId;
     private String username;
+    private String mobile;
     private String password;
     private String nickname;
     private String accountType;

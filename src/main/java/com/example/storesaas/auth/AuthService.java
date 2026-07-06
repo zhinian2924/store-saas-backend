@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.auth.dto.LoginRequest;
 import com.example.storesaas.auth.dto.LoginResponse;
 import com.example.storesaas.auth.dto.RegisterTenantRequest;
+import com.example.storesaas.auth.dto.SmsCodeRequest;
+import com.example.storesaas.auth.dto.SmsCodeResponse;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.LoginUser;
@@ -15,14 +17,22 @@ import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import com.example.storesaas.user.entity.SysUser;
 import com.example.storesaas.user.mapper.SysUserMapper;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class AuthService {
+    private static final Duration SMS_CODE_TTL = Duration.ofMinutes(5);
+    private static final String STORE_SMS_CODE_KEY_PREFIX = "auth:sms:store:";
+    private static final String SMS_LOGIN_TYPE = "sms";
+    private static final String PASSWORD_LOGIN_TYPE = "password";
     private static final List<String> STORE_ADMIN_PERMISSIONS = List.of(
             "store:view", "store:update",
             "product:view", "product:add", "product:update",
@@ -33,23 +43,28 @@ public class AuthService {
     private final TenantMapper tenantMapper;
     private final StoreMapper storeMapper;
     private final SysUserMapper sysUserMapper;
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public AuthService(TenantMapper tenantMapper, StoreMapper storeMapper, SysUserMapper sysUserMapper) {
+    public AuthService(TenantMapper tenantMapper, StoreMapper storeMapper, SysUserMapper sysUserMapper, StringRedisTemplate stringRedisTemplate) {
         this.tenantMapper = tenantMapper;
         this.storeMapper = storeMapper;
         this.sysUserMapper = sysUserMapper;
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
     @Transactional
     public LoginResponse registerTenant(RegisterTenantRequest request) {
-        Long count = tenantMapper.selectCount(new LambdaQueryWrapper<Tenant>().eq(Tenant::getTenantCode, request.tenantCode()));
-        if (count > 0) {
-            throw new BusinessException("租户编码已存在");
+        Long mobileCount = sysUserMapper.selectCount(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getAccountType, AccountType.STORE.name())
+                .eq(SysUser::getMobile, request.mobile())
+                .eq(SysUser::getDeleted, 0));
+        if (mobileCount > 0) {
+            throw new BusinessException("手机号已被商户账号使用");
         }
 
         LocalDateTime now = LocalDateTime.now();
         Tenant tenant = new Tenant();
-        tenant.setTenantCode(request.tenantCode());
+        tenant.setTenantCode(generateTenantCode(request.storeName()));
         tenant.setName(request.storeName());
         tenant.setStatus(1);
         tenant.setCreatedAt(now);
@@ -69,6 +84,7 @@ public class AuthService {
         SysUser owner = new SysUser();
         owner.setTenantId(tenant.getId());
         owner.setUsername(request.username());
+        owner.setMobile(request.mobile());
         owner.setPassword(request.password());
         owner.setNickname("店主");
         owner.setAccountType(AccountType.STORE.name());
@@ -81,15 +97,18 @@ public class AuthService {
         return doLogin(owner, STORE_ADMIN_PERMISSIONS);
     }
 
-    public LoginResponse login(LoginRequest request, AccountType accountType) {
-        SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
-                .eq(SysUser::getUsername, request.username())
-                .eq(SysUser::getAccountType, accountType.name())
-                .eq(SysUser::getDeleted, 0)
-                .last("limit 1"));
-        if (user == null || !user.getPassword().equals(request.password())) {
-            throw new BusinessException("用户名或密码错误");
+    public SmsCodeResponse sendStoreSmsCode(SmsCodeRequest request) {
+        SysUser user = findStoreUserByMobile(request.mobile());
+        if (Integer.valueOf(0).equals(user.getStatus())) {
+            throw new BusinessException("账号已禁用");
         }
+        String code = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
+        stringRedisTemplate.opsForValue().set(storeSmsCodeKey(request.mobile()), code, SMS_CODE_TTL);
+        return new SmsCodeResponse(request.mobile(), (int) SMS_CODE_TTL.toSeconds(), code);
+    }
+
+    public LoginResponse login(LoginRequest request, AccountType accountType) {
+        SysUser user = accountType == AccountType.STORE ? storeLogin(request) : platformLogin(request, accountType);
         if (Integer.valueOf(0).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
@@ -97,6 +116,98 @@ public class AuthService {
                 ? List.of("tenant:view", "tenant:add", "tenant:update", "statistics:view")
                 : STORE_ADMIN_PERMISSIONS;
         return doLogin(user, permissions);
+    }
+
+    private SysUser storeLogin(LoginRequest request) {
+        if (!hasText(request.mobile())) {
+            throw new BusinessException("请输入手机号");
+        }
+        SysUser user = findStoreUserByMobile(request.mobile());
+        String loginType = hasText(request.loginType()) ? request.loginType() : (hasText(request.code()) ? SMS_LOGIN_TYPE : PASSWORD_LOGIN_TYPE);
+        if (SMS_LOGIN_TYPE.equalsIgnoreCase(loginType)) {
+            verifySmsCode(request.mobile(), request.code());
+            return user;
+        }
+        if (!hasText(request.password()) || !request.password().equals(user.getPassword())) {
+            throw new BusinessException("手机号或密码错误");
+        }
+        return user;
+    }
+
+    private SysUser platformLogin(LoginRequest request, AccountType accountType) {
+        if (!hasText(request.username()) || !hasText(request.password())) {
+            throw new BusinessException("请输入用户名和密码");
+        }
+        SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getUsername, request.username())
+                .eq(SysUser::getAccountType, accountType.name())
+                .eq(SysUser::getDeleted, 0)
+                .last("limit 1"));
+        if (user == null || !request.password().equals(user.getPassword())) {
+            throw new BusinessException("用户名或密码错误");
+        }
+        return user;
+    }
+
+    private SysUser findStoreUserByMobile(String mobile) {
+        SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
+                .eq(SysUser::getMobile, mobile)
+                .eq(SysUser::getAccountType, AccountType.STORE.name())
+                .eq(SysUser::getDeleted, 0)
+                .last("limit 1"));
+        if (user == null) {
+            throw new BusinessException("手机号未注册");
+        }
+        return user;
+    }
+
+    private void verifySmsCode(String mobile, String code) {
+        if (!hasText(code)) {
+            throw new BusinessException("请输入验证码");
+        }
+        String key = storeSmsCodeKey(mobile);
+        String savedCode = stringRedisTemplate.opsForValue().get(key);
+        if (savedCode == null) {
+            throw new BusinessException("验证码已过期，请重新获取");
+        }
+        if (!savedCode.equals(code)) {
+            throw new BusinessException("验证码错误");
+        }
+        stringRedisTemplate.delete(key);
+    }
+
+    private String storeSmsCodeKey(String mobile) {
+        return STORE_SMS_CODE_KEY_PREFIX + mobile;
+    }
+
+    private String generateTenantCode(String storeName) {
+        String prefix = normalizeTenantCodePrefix(storeName);
+        for (int i = 0; i < 10; i++) {
+            String candidate = prefix + "-" + ThreadLocalRandom.current().nextInt(100000, 1000000);
+            Long count = tenantMapper.selectCount(new LambdaQueryWrapper<Tenant>().eq(Tenant::getTenantCode, candidate));
+            if (count == 0) {
+                return candidate;
+            }
+        }
+        throw new BusinessException("门店编码生成失败，请稍后重试");
+    }
+
+    private String normalizeTenantCodePrefix(String storeName) {
+        if (!hasText(storeName)) {
+            return "store";
+        }
+        String normalized = storeName.trim()
+                .toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("(^-+|-+$)", "");
+        if (!hasText(normalized)) {
+            return "store";
+        }
+        return normalized.length() > 24 ? normalized.substring(0, 24).replaceAll("-+$", "") : normalized;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     /**
