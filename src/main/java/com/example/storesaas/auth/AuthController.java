@@ -24,8 +24,9 @@ public class AuthController {
     }
 
     @PostMapping("/tenant/register")
-    public ApiResponse<LoginResponse> registerTenant(@Valid @RequestBody RegisterTenantRequest request) {
-        return ApiResponse.ok(authService.registerTenant(request));
+    public ApiResponse<Void> registerTenant(@Valid @RequestBody RegisterTenantRequest request) {
+        authService.registerTenant(request);
+        return ApiResponse.ok();
     }
 
     @PostMapping("/store/login")

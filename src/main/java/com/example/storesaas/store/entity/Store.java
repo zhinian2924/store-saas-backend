@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 public class Store extends BaseEntity {
     private Long tenantId;
     private String name;
-    private String address;
+    private String address;// 地址
     private String businessHours;// 营业时间
     private String logoUrl;// logo图片地址
 }

@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -28,6 +30,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     public ApiResponse<Void> handleValidation(Exception ex) {
         return ApiResponse.fail(422, "参数校验失败");
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ApiResponse<Void> handleDuplicateEntry(SQLIntegrityConstraintViolationException ex) {
+        String message = ex.getMessage();
+        if (message != null && message.contains("Duplicate entry")) {
+            return ApiResponse.fail(409, "数据已存在，请勿重复添加");
+        }
+        return ApiResponse.fail(409, "数据冲突");
     }
 
     @ExceptionHandler(Exception.class)

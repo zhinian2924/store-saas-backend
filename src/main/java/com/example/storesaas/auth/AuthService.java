@@ -13,6 +13,7 @@ import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.LoginUser;
 import com.example.storesaas.store.entity.Store;
 import com.example.storesaas.store.mapper.StoreMapper;
+import com.example.storesaas.tenant.TenantStatus;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import com.example.storesaas.user.entity.SysUser;
@@ -53,7 +54,7 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginResponse registerTenant(RegisterTenantRequest request) {
+    public void registerTenant(RegisterTenantRequest request) {
         Long mobileCount = sysUserMapper.selectCount(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
                 .eq(SysUser::getMobile, request.mobile())
@@ -66,7 +67,7 @@ public class AuthService {
         Tenant tenant = new Tenant();
         tenant.setTenantCode(generateTenantCode(request.storeName()));
         tenant.setName(request.storeName());
-        tenant.setStatus(1);
+        tenant.setStatus(TenantStatus.PENDING);
         tenant.setCreatedAt(now);
         tenant.setUpdatedAt(now);
         tenant.setDeleted(0);
@@ -75,7 +76,8 @@ public class AuthService {
         Store store = new Store();
         store.setTenantId(tenant.getId());
         store.setName(request.storeName());
-        store.setBusinessHours("09:00-22:00");
+        store.setAddress(request.address());
+        store.setBusinessHours(request.businessHours());
         store.setCreatedAt(now);
         store.setUpdatedAt(now);
         store.setDeleted(0);
@@ -83,22 +85,22 @@ public class AuthService {
 
         SysUser owner = new SysUser();
         owner.setTenantId(tenant.getId());
-        owner.setUsername(request.username());
+        owner.setUsername(generateStoreOwnerUsername(tenant.getId()));
         owner.setMobile(request.mobile());
         owner.setPassword(request.password());
         owner.setNickname("店主");
         owner.setAccountType(AccountType.STORE.name());
-        owner.setStatus(1);
+        owner.setStatus(0);
         owner.setCreatedAt(now);
         owner.setUpdatedAt(now);
         owner.setDeleted(0);
         sysUserMapper.insert(owner);
 
-        return doLogin(owner, STORE_ADMIN_PERMISSIONS);
     }
 
     public SmsCodeResponse sendStoreSmsCode(SmsCodeRequest request) {
         SysUser user = findStoreUserByMobile(request.mobile());
+        ensureTenantCanLogin(user.getTenantId());
         if (Integer.valueOf(0).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
@@ -109,6 +111,9 @@ public class AuthService {
 
     public LoginResponse login(LoginRequest request, AccountType accountType) {
         SysUser user = accountType == AccountType.STORE ? storeLogin(request) : platformLogin(request, accountType);
+        if (accountType == AccountType.STORE) {
+            ensureTenantCanLogin(user.getTenantId());
+        }
         if (Integer.valueOf(0).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
@@ -132,6 +137,22 @@ public class AuthService {
             throw new BusinessException("手机号或密码错误");
         }
         return user;
+    }
+
+    private void ensureTenantCanLogin(Long tenantId) {
+        Tenant tenant = tenantMapper.selectById(tenantId);
+        if (tenant == null || Integer.valueOf(1).equals(tenant.getDeleted())) {
+            throw new BusinessException("门店不存在");
+        }
+        if (Integer.valueOf(TenantStatus.PENDING).equals(tenant.getStatus())) {
+            throw new BusinessException("入驻申请待平台审核");
+        }
+        if (Integer.valueOf(TenantStatus.REJECTED).equals(tenant.getStatus())) {
+            throw new BusinessException("入驻申请未通过审核");
+        }
+        if (!Integer.valueOf(TenantStatus.ACTIVE).equals(tenant.getStatus())) {
+            throw new BusinessException("门店已停用");
+        }
     }
 
     private SysUser platformLogin(LoginRequest request, AccountType accountType) {
@@ -180,6 +201,20 @@ public class AuthService {
         return STORE_SMS_CODE_KEY_PREFIX + mobile;
     }
 
+    /**
+     * 生成门店管理员用户名
+     * @param tenantId 门店ID
+     * @return 用户名
+     */
+    private String generateStoreOwnerUsername(Long tenantId) {
+        return "store_" + tenantId;
+    }
+
+    /**
+     * 生成门店编码
+     * @param storeName 门店名称
+     * @return 门店编码
+     */
     private String generateTenantCode(String storeName) {
         String prefix = normalizeTenantCodePrefix(storeName);
         for (int i = 0; i < 10; i++) {
@@ -192,6 +227,11 @@ public class AuthService {
         throw new BusinessException("门店编码生成失败，请稍后重试");
     }
 
+    /**
+     * 规范化门店编码前缀
+     * @param storeName 门店名称
+     * @return 规范化后的前缀
+     */
     private String normalizeTenantCodePrefix(String storeName) {
         if (!hasText(storeName)) {
             return "store";

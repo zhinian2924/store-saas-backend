@@ -5,7 +5,8 @@ import jakarta.validation.constraints.Pattern;
 
 public record RegisterTenantRequest(
         @NotBlank String storeName,
-        @NotBlank String username,
+        @NotBlank String address,
+        @NotBlank String businessHours,
         @NotBlank @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确") String mobile,
         @NotBlank String password
 ) {
