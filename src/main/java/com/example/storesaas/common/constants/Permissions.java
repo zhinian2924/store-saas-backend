@@ -12,10 +12,16 @@ public final class Permissions {
     public static final String INVENTORY_VIEW = "inventory:view";
     public static final String INVENTORY_ADJUST = "inventory:adjust";
 
+    // 订单权限
     public static final String ORDER_VIEW = "order:view";
 
+    // 员工权限
     public static final String STAFF_VIEW = "staff:view";
+    public static final String STAFF_ADD = "staff:add";
+    public static final String STAFF_UPDATE = "staff:update";
+    public static final String STAFF_DISABLE = "staff:disable";
 
+    // 统计权限
     public static final String STATISTICS_VIEW = "statistics:view";
 
     // 租户权限

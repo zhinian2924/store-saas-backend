@@ -8,6 +8,7 @@ public record LoginUser(
         Long tenantId,
         AccountType accountType,
         String username,
+        String staffRole,
         List<String> permissions
 ) implements Serializable {
 }

@@ -15,5 +15,7 @@ public class SysUser extends BaseEntity {
     private String password;
     private String nickname;
     private String accountType;
+    private String staffRole;// 员工角色
+    private String permissions;// 权限
     private Integer status;
 }

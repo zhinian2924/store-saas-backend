@@ -1,11 +1,13 @@
 -- 插入平台管理员用户
-insert into sys_user (tenant_id, username, mobile, password, nickname, account_type, status, created_at, updated_at,
+insert into sys_user (tenant_id, username, mobile, password, nickname, staff_role, permissions, account_type, status, created_at, updated_at,
                       deleted)
 select null,
        'admin',
        null,
        'admin123',
        '平台管理员',
+       null,
+       null,
        'PLATFORM',
        1,
        now(),
@@ -29,13 +31,15 @@ where t.tenant_code = 'demo'
   and not exists (select 1 from biz_store s where s.tenant_id = t.id and s.deleted = 0);
 
 -- 插入店主用户（已启用）
-insert into sys_user (tenant_id, username, mobile, password, nickname, account_type, status, created_at, updated_at,
+insert into sys_user (tenant_id, username, mobile, password, nickname, staff_role, permissions, account_type, status, created_at, updated_at,
                       deleted)
 select t.id,
        'demo',
        '13800000000',
        'demo123',
        '店主',
+       'OWNER',
+       'store:view,store:update,product:view,product:add,product:update,inventory:view,inventory:adjust,order:view,staff:view,staff:add,staff:update,staff:disable,statistics:view',
        'STORE',
        1,
        now(),

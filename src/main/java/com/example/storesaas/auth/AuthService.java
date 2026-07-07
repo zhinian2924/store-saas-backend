@@ -22,6 +22,8 @@ import com.example.storesaas.store.mapper.StoreMapper;
 import com.example.storesaas.tenant.TenantStatus;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
+import com.example.storesaas.user.StaffPermissions;
+import com.example.storesaas.user.StaffRole;
 import com.example.storesaas.user.entity.SysUser;
 import com.example.storesaas.user.mapper.SysUserMapper;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -38,13 +40,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AuthService {
     private static final Duration SMS_CODE_TTL = Duration.ofMinutes(5);// SMS验证码有效期5分钟
     // 商户管理员权限
-    private static final List<String> STORE_ADMIN_PERMISSIONS = List.of(
-            Permissions.STORE_VIEW, Permissions.STORE_UPDATE,
-            Permissions.PRODUCT_VIEW, Permissions.PRODUCT_ADD, Permissions.PRODUCT_UPDATE,
-            Permissions.INVENTORY_VIEW, Permissions.INVENTORY_ADJUST,
-            Permissions.ORDER_VIEW, Permissions.STAFF_VIEW, Permissions.STATISTICS_VIEW
-    );
-
+    private static final List<String> STORE_ADMIN_PERMISSIONS = List.of();
     private final TenantMapper tenantMapper;
     private final StoreMapper storeMapper;
     private final SysUserMapper sysUserMapper;
@@ -94,6 +90,8 @@ public class AuthService {
         owner.setPassword(request.password());
         owner.setNickname("店主");
         owner.setAccountType(AccountType.STORE.name());
+        owner.setStaffRole(StaffRole.OWNER.name());
+        owner.setPermissions(StaffPermissions.join(StaffPermissions.owner()));
         owner.setStatus(CommonStatus.DISABLED);
         owner.setCreatedAt(now);
         owner.setUpdatedAt(now);
@@ -128,7 +126,7 @@ public class AuthService {
         }
         List<String> permissions = accountType == AccountType.PLATFORM
                 ? List.of(Permissions.TENANT_VIEW, Permissions.TENANT_ADD, Permissions.TENANT_UPDATE, Permissions.STATISTICS_VIEW)
-                : STORE_ADMIN_PERMISSIONS;
+                : StaffPermissions.parse(user.getPermissions(), user.getStaffRole());
         return doLogin(user, permissions);
     }
 
@@ -290,7 +288,7 @@ public class AuthService {
      */
     private LoginResponse doLogin(SysUser user, List<String> permissions) {
         StpUtil.login(user.getId());
-        LoginUser loginUser = new LoginUser(user.getId(), user.getTenantId(), AccountType.valueOf(user.getAccountType()), user.getUsername(), permissions);
+        LoginUser loginUser = new LoginUser(user.getId(), user.getTenantId(), AccountType.valueOf(user.getAccountType()), user.getUsername(), user.getStaffRole(), permissions);
         StpUtil.getSession().set("loginUser", loginUser);
         SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
         return new LoginResponse(tokenInfo.getTokenName(), tokenInfo.getTokenValue(), user.getTenantId(), user.getUsername(), permissions);

@@ -6,6 +6,8 @@
       mobile varchar(20) comment '手机号',
       password varchar(128) not null comment '密码',
       nickname varchar(64) comment '昵称',
+      staff_role varchar(32) comment '店员岗位',
+      permissions varchar(512) comment '权限码，逗号分隔',
       account_type varchar(32) not null comment '账号类型',
       status tinyint not null default 1 comment '状态：1-正常 0-停用',
       created_at datetime not null comment '创建时间',
