@@ -27,7 +27,6 @@ public class StaffService {
     }
 
     public List<StaffResponse> list() {
-        ensureOwner();
         return sysUserMapper.selectList(new LambdaQueryWrapper<SysUser>()
                         .eq(SysUser::getTenantId, AuthContext.tenantId())
                         .eq(SysUser::getAccountType, AccountType.STORE.name())

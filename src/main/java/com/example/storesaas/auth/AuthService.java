@@ -3,6 +3,8 @@ package com.example.storesaas.auth;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.example.storesaas.auth.dto.AccountProfileResponse;
+import com.example.storesaas.auth.dto.AccountProfileUpdateRequest;
 import com.example.storesaas.auth.dto.LoginRequest;
 import com.example.storesaas.auth.dto.LoginResponse;
 import com.example.storesaas.auth.dto.RegisterTenantRequest;
@@ -16,6 +18,7 @@ import com.example.storesaas.common.constants.LoginType;
 import com.example.storesaas.common.constants.Permissions;
 import com.example.storesaas.common.constants.RedisKeys;
 import com.example.storesaas.security.AccountType;
+import com.example.storesaas.security.AuthContext;
 import com.example.storesaas.security.LoginUser;
 import com.example.storesaas.store.entity.Store;
 import com.example.storesaas.store.mapper.StoreMapper;
@@ -130,6 +133,22 @@ public class AuthService {
         return doLogin(user, permissions);
     }
 
+    public AccountProfileResponse me() {
+        return AccountProfileResponse.from(currentUser());
+    }
+
+    @Transactional
+    public AccountProfileResponse updateMe(AccountProfileUpdateRequest request) {
+        SysUser user = currentUser();
+        user.setNickname(request.nickname().trim());
+        if (hasText(request.password())) {
+            user.setPassword(request.password());
+        }
+        user.setUpdatedAt(LocalDateTime.now());
+        sysUserMapper.updateById(user);
+        return AccountProfileResponse.from(user);
+    }
+
     /**
      * 商户登录
      * @param request 登录请求
@@ -205,6 +224,14 @@ public class AuthService {
                 .last("limit 1"));
         if (user == null) {
             throw new BusinessException("手机号未注册");
+        }
+        return user;
+    }
+
+    private SysUser currentUser() {
+        SysUser user = sysUserMapper.selectById(AuthContext.currentUser().userId());
+        if (user == null || Integer.valueOf(DeleteStatus.DELETED).equals(user.getDeleted())) {
+            throw new BusinessException("账号不存在");
         }
         return user;
     }

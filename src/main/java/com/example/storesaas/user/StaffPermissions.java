@@ -6,33 +6,43 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class StaffPermissions {
+    // 店主
     private static final List<String> OWNER = List.of(
             Permissions.STORE_VIEW, Permissions.STORE_UPDATE,
             Permissions.PRODUCT_VIEW, Permissions.PRODUCT_ADD, Permissions.PRODUCT_UPDATE,
             Permissions.INVENTORY_VIEW, Permissions.INVENTORY_ADJUST,
-            Permissions.ORDER_VIEW,
+            Permissions.ORDER_VIEW, Permissions.ORDER_UPDATE,
             Permissions.STAFF_VIEW, Permissions.STAFF_ADD, Permissions.STAFF_UPDATE, Permissions.STAFF_DISABLE,
             Permissions.STATISTICS_VIEW
     );
 
-    private static final List<String> CASHIER = List.of(Permissions.PRODUCT_VIEW, Permissions.ORDER_VIEW);
+    // 订单专员
+    private static final List<String> CASHIER = List.of(
+            Permissions.ORDER_VIEW, Permissions.ORDER_UPDATE);
 
+    // 库管
     private static final List<String> WAREHOUSE = List.of(
-            Permissions.PRODUCT_VIEW,
+            Permissions.PRODUCT_VIEW, Permissions.PRODUCT_ADD, Permissions.PRODUCT_UPDATE,
             Permissions.INVENTORY_VIEW, Permissions.INVENTORY_ADJUST
     );
 
+    // 助理
     private static final List<String> MANAGER_ASSISTANT = List.of(
-            Permissions.PRODUCT_VIEW, Permissions.PRODUCT_ADD, Permissions.PRODUCT_UPDATE,
-            Permissions.INVENTORY_VIEW, Permissions.INVENTORY_ADJUST,
-            Permissions.ORDER_VIEW, Permissions.STATISTICS_VIEW
+            Permissions.STORE_VIEW,
+            Permissions.PRODUCT_VIEW,
+            Permissions.INVENTORY_VIEW,
+            Permissions.ORDER_VIEW,
+            Permissions.STAFF_VIEW,
+            Permissions.STATISTICS_VIEW
     );
 
+    // 可授权权限
     private static final List<String> GRANTABLE = List.of(
-            Permissions.STORE_VIEW,
+            Permissions.STORE_VIEW, Permissions.STORE_UPDATE,
             Permissions.PRODUCT_VIEW, Permissions.PRODUCT_ADD, Permissions.PRODUCT_UPDATE,
             Permissions.INVENTORY_VIEW, Permissions.INVENTORY_ADJUST,
-            Permissions.ORDER_VIEW,
+            Permissions.ORDER_VIEW, Permissions.ORDER_UPDATE,
+            Permissions.STAFF_VIEW,
             Permissions.STATISTICS_VIEW
     );
 

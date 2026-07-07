@@ -20,6 +20,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    @SaCheckPermission(Permissions.ORDER_UPDATE)
     @PostMapping
     public ApiResponse<StoreOrder> create(@Valid @RequestBody CreateOrderRequest request) {
         return ApiResponse.ok(orderService.create(request));

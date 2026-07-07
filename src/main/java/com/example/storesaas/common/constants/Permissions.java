@@ -5,15 +5,18 @@ public final class Permissions {
     public static final String STORE_VIEW = "store:view";
     public static final String STORE_UPDATE = "store:update";
 
+    // 商品权限
     public static final String PRODUCT_VIEW = "product:view";
     public static final String PRODUCT_ADD = "product:add";
     public static final String PRODUCT_UPDATE = "product:update";
 
+    // 库存权限
     public static final String INVENTORY_VIEW = "inventory:view";
     public static final String INVENTORY_ADJUST = "inventory:adjust";
 
     // 订单权限
     public static final String ORDER_VIEW = "order:view";
+    public static final String ORDER_UPDATE = "order:update";
 
     // 员工权限
     public static final String STAFF_VIEW = "staff:view";
