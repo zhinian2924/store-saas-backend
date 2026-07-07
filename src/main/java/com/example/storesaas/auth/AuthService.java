@@ -9,6 +9,12 @@ import com.example.storesaas.auth.dto.RegisterTenantRequest;
 import com.example.storesaas.auth.dto.SmsCodeRequest;
 import com.example.storesaas.auth.dto.SmsCodeResponse;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.constants.BusinessConstants;
+import com.example.storesaas.common.constants.CommonStatus;
+import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.common.constants.LoginType;
+import com.example.storesaas.common.constants.Permissions;
+import com.example.storesaas.common.constants.RedisKeys;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.LoginUser;
 import com.example.storesaas.store.entity.Store;
@@ -30,15 +36,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class AuthService {
-    private static final Duration SMS_CODE_TTL = Duration.ofMinutes(5);
-    private static final String STORE_SMS_CODE_KEY_PREFIX = "auth:sms:store:";
-    private static final String SMS_LOGIN_TYPE = "sms";
-    private static final String PASSWORD_LOGIN_TYPE = "password";
+    private static final Duration SMS_CODE_TTL = Duration.ofMinutes(5);// SMS验证码有效期5分钟
+    // 商户管理员权限
     private static final List<String> STORE_ADMIN_PERMISSIONS = List.of(
-            "store:view", "store:update",
-            "product:view", "product:add", "product:update",
-            "inventory:view", "inventory:adjust",
-            "order:view", "staff:view", "statistics:view"
+            Permissions.STORE_VIEW, Permissions.STORE_UPDATE,
+            Permissions.PRODUCT_VIEW, Permissions.PRODUCT_ADD, Permissions.PRODUCT_UPDATE,
+            Permissions.INVENTORY_VIEW, Permissions.INVENTORY_ADJUST,
+            Permissions.ORDER_VIEW, Permissions.STAFF_VIEW, Permissions.STATISTICS_VIEW
     );
 
     private final TenantMapper tenantMapper;
@@ -58,7 +62,7 @@ public class AuthService {
         Long mobileCount = sysUserMapper.selectCount(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
                 .eq(SysUser::getMobile, request.mobile())
-                .eq(SysUser::getDeleted, 0));
+                .eq(SysUser::getDeleted, DeleteStatus.NOT_DELETED));
         if (mobileCount > 0) {
             throw new BusinessException("手机号已被商户账号使用");
         }
@@ -70,7 +74,7 @@ public class AuthService {
         tenant.setStatus(TenantStatus.PENDING);
         tenant.setCreatedAt(now);
         tenant.setUpdatedAt(now);
-        tenant.setDeleted(0);
+        tenant.setDeleted(DeleteStatus.NOT_DELETED);
         tenantMapper.insert(tenant);
 
         Store store = new Store();
@@ -80,7 +84,7 @@ public class AuthService {
         store.setBusinessHours(request.businessHours());
         store.setCreatedAt(now);
         store.setUpdatedAt(now);
-        store.setDeleted(0);
+        store.setDeleted(DeleteStatus.NOT_DELETED);
         storeMapper.insert(store);
 
         SysUser owner = new SysUser();
@@ -90,22 +94,27 @@ public class AuthService {
         owner.setPassword(request.password());
         owner.setNickname("店主");
         owner.setAccountType(AccountType.STORE.name());
-        owner.setStatus(0);
+        owner.setStatus(CommonStatus.DISABLED);
         owner.setCreatedAt(now);
         owner.setUpdatedAt(now);
-        owner.setDeleted(0);
+        owner.setDeleted(DeleteStatus.NOT_DELETED);
         sysUserMapper.insert(owner);
 
     }
 
+    /**
+     * 发送商户短信验证码
+     * @param request 短信验证码请求
+     * @return 短信验证码响应
+     */
     public SmsCodeResponse sendStoreSmsCode(SmsCodeRequest request) {
         SysUser user = findStoreUserByMobile(request.mobile());
         ensureTenantCanLogin(user.getTenantId());
-        if (Integer.valueOf(0).equals(user.getStatus())) {
+        if (Integer.valueOf(CommonStatus.DISABLED).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
-        String code = String.valueOf(ThreadLocalRandom.current().nextInt(100000, 1000000));
-        stringRedisTemplate.opsForValue().set(storeSmsCodeKey(request.mobile()), code, SMS_CODE_TTL);
+        String code = String.valueOf(ThreadLocalRandom.current().nextInt(BusinessConstants.SMS_CODE_RANGE_MIN, BusinessConstants.SMS_CODE_RANGE_MAX));
+        stringRedisTemplate.opsForValue().set(RedisKeys.storeSmsCode(request.mobile()), code, SMS_CODE_TTL);
         return new SmsCodeResponse(request.mobile(), (int) SMS_CODE_TTL.toSeconds(), code);
     }
 
@@ -114,22 +123,27 @@ public class AuthService {
         if (accountType == AccountType.STORE) {
             ensureTenantCanLogin(user.getTenantId());
         }
-        if (Integer.valueOf(0).equals(user.getStatus())) {
+        if (Integer.valueOf(CommonStatus.DISABLED).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
         List<String> permissions = accountType == AccountType.PLATFORM
-                ? List.of("tenant:view", "tenant:add", "tenant:update", "statistics:view")
+                ? List.of(Permissions.TENANT_VIEW, Permissions.TENANT_ADD, Permissions.TENANT_UPDATE, Permissions.STATISTICS_VIEW)
                 : STORE_ADMIN_PERMISSIONS;
         return doLogin(user, permissions);
     }
 
+    /**
+     * 商户登录
+     * @param request 登录请求
+     * @return 登录响应
+     */
     private SysUser storeLogin(LoginRequest request) {
         if (!hasText(request.mobile())) {
             throw new BusinessException("请输入手机号");
         }
         SysUser user = findStoreUserByMobile(request.mobile());
-        String loginType = hasText(request.loginType()) ? request.loginType() : (hasText(request.code()) ? SMS_LOGIN_TYPE : PASSWORD_LOGIN_TYPE);
-        if (SMS_LOGIN_TYPE.equalsIgnoreCase(loginType)) {
+        String loginType = hasText(request.loginType()) ? request.loginType() : (hasText(request.code()) ? LoginType.SMS : LoginType.PASSWORD);
+        if (LoginType.SMS.equalsIgnoreCase(loginType)) {
             verifySmsCode(request.mobile(), request.code());
             return user;
         }
@@ -139,9 +153,13 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * 确保商户可以登录
+     * @param tenantId 门店ID
+     */
     private void ensureTenantCanLogin(Long tenantId) {
         Tenant tenant = tenantMapper.selectById(tenantId);
-        if (tenant == null || Integer.valueOf(1).equals(tenant.getDeleted())) {
+        if (tenant == null || Integer.valueOf(DeleteStatus.DELETED).equals(tenant.getDeleted())) {
             throw new BusinessException("门店不存在");
         }
         if (Integer.valueOf(TenantStatus.PENDING).equals(tenant.getStatus())) {
@@ -155,6 +173,12 @@ public class AuthService {
         }
     }
 
+    /**
+     * 平台登录
+     * @param request 登录请求
+     * @param accountType 账号类型
+     * @return 登录响应
+     */
     private SysUser platformLogin(LoginRequest request, AccountType accountType) {
         if (!hasText(request.username()) || !hasText(request.password())) {
             throw new BusinessException("请输入用户名和密码");
@@ -162,7 +186,7 @@ public class AuthService {
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getUsername, request.username())
                 .eq(SysUser::getAccountType, accountType.name())
-                .eq(SysUser::getDeleted, 0)
+                .eq(SysUser::getDeleted, DeleteStatus.NOT_DELETED)
                 .last("limit 1"));
         if (user == null || !request.password().equals(user.getPassword())) {
             throw new BusinessException("用户名或密码错误");
@@ -170,11 +194,16 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * 根据手机号查找门店用户
+     * @param mobile 手机号
+     * @return 门店用户
+     */
     private SysUser findStoreUserByMobile(String mobile) {
         SysUser user = sysUserMapper.selectOne(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getMobile, mobile)
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
-                .eq(SysUser::getDeleted, 0)
+                .eq(SysUser::getDeleted, DeleteStatus.NOT_DELETED)
                 .last("limit 1"));
         if (user == null) {
             throw new BusinessException("手机号未注册");
@@ -182,11 +211,16 @@ public class AuthService {
         return user;
     }
 
+    /**
+     * 验证短信验证码
+     * @param mobile 手机号
+     * @param code 验证码
+     */
     private void verifySmsCode(String mobile, String code) {
         if (!hasText(code)) {
             throw new BusinessException("请输入验证码");
         }
-        String key = storeSmsCodeKey(mobile);
+        String key = RedisKeys.storeSmsCode(mobile);
         String savedCode = stringRedisTemplate.opsForValue().get(key);
         if (savedCode == null) {
             throw new BusinessException("验证码已过期，请重新获取");
@@ -197,17 +231,13 @@ public class AuthService {
         stringRedisTemplate.delete(key);
     }
 
-    private String storeSmsCodeKey(String mobile) {
-        return STORE_SMS_CODE_KEY_PREFIX + mobile;
-    }
-
     /**
      * 生成门店管理员用户名
      * @param tenantId 门店ID
      * @return 用户名
      */
     private String generateStoreOwnerUsername(Long tenantId) {
-        return "store_" + tenantId;
+        return BusinessConstants.STORE_USERNAME_PREFIX + tenantId;
     }
 
     /**
@@ -217,8 +247,8 @@ public class AuthService {
      */
     private String generateTenantCode(String storeName) {
         String prefix = normalizeTenantCodePrefix(storeName);
-        for (int i = 0; i < 10; i++) {
-            String candidate = prefix + "-" + ThreadLocalRandom.current().nextInt(100000, 1000000);
+        for (int i = 0; i < BusinessConstants.TENANT_CODE_RETRY_LIMIT; i++) {
+            String candidate = prefix + "-" + ThreadLocalRandom.current().nextInt(BusinessConstants.SMS_CODE_RANGE_MIN, BusinessConstants.SMS_CODE_RANGE_MAX);
             Long count = tenantMapper.selectCount(new LambdaQueryWrapper<Tenant>().eq(Tenant::getTenantCode, candidate));
             if (count == 0) {
                 return candidate;
@@ -234,16 +264,18 @@ public class AuthService {
      */
     private String normalizeTenantCodePrefix(String storeName) {
         if (!hasText(storeName)) {
-            return "store";
+            return BusinessConstants.DEFAULT_TENANT_CODE_PREFIX;
         }
         String normalized = storeName.trim()
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("(^-+|-+$)", "");
         if (!hasText(normalized)) {
-            return "store";
+            return BusinessConstants.DEFAULT_TENANT_CODE_PREFIX;
         }
-        return normalized.length() > 24 ? normalized.substring(0, 24).replaceAll("-+$", "") : normalized;
+        return normalized.length() > BusinessConstants.TENANT_CODE_MAX_PREFIX_LENGTH
+                ? normalized.substring(0, BusinessConstants.TENANT_CODE_MAX_PREFIX_LENGTH).replaceAll("-+$", "")
+                : normalized;
     }
 
     private boolean hasText(String value) {

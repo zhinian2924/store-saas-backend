@@ -4,6 +4,7 @@ import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
+import com.example.storesaas.common.constants.ApiRoutes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -15,15 +16,24 @@ import java.util.List;
 
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
+
+    /**
+     * 配置 SaToken 拦截器
+     * @param registry 拦截器注册器
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SaInterceptor(handler -> SaRouter.match("/**")
-                        .notMatch("/api/auth/**", "/api/mini/auth/**", "/v3/api-docs/**",
+                        .notMatch(ApiRoutes.AUTH + "/**", ApiRoutes.MINI_AUTH, "/v3/api-docs/**",
                                 "/swagger-ui/**", "/swagger-ui.html")
                         .check(StpUtil::checkLogin)))
                 .addPathPatterns("/**");
     }
 
+    /**
+     * 配置跨域
+     * @param registry 跨域注册器
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -33,6 +43,10 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
+    /**
+     * 配置权限认证接口
+     * @return StpInterface
+     */
     @Bean
     public StpInterface stpInterface() {
         return new StpInterface() {

@@ -2,6 +2,7 @@ package com.example.storesaas.order;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
+import com.example.storesaas.common.constants.Permissions;
 import com.example.storesaas.order.dto.CreateOrderRequest;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
@@ -24,13 +25,13 @@ public class OrderController {
         return ApiResponse.ok(orderService.create(request));
     }
 
-    @SaCheckPermission("order:view")
+    @SaCheckPermission(Permissions.ORDER_VIEW)
     @GetMapping
     public ApiResponse<List<StoreOrder>> list() {
         return ApiResponse.ok(orderService.list());
     }
 
-    @SaCheckPermission("order:view")
+    @SaCheckPermission(Permissions.ORDER_VIEW)
     @GetMapping("/{orderId}/items")
     public ApiResponse<List<OrderItem>> items(@PathVariable Long orderId) {
         return ApiResponse.ok(orderService.items(orderId));

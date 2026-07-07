@@ -4,6 +4,9 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.constants.CommonStatus;
+import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.common.constants.Permissions;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
@@ -30,11 +33,11 @@ public class TenantController {
         this.sysUserMapper = sysUserMapper;
     }
 
-    @SaCheckPermission("tenant:view")
+    @SaCheckPermission(Permissions.TENANT_VIEW)
     @GetMapping
     public ApiResponse<List<Tenant>> list(@RequestParam(required = false) Integer status) {
         LambdaQueryWrapper<Tenant> query = new LambdaQueryWrapper<Tenant>()
-                .eq(Tenant::getDeleted, 0)
+                .eq(Tenant::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByDesc(Tenant::getId);
         if (status != null) {
             query.eq(Tenant::getStatus, status);
@@ -42,7 +45,7 @@ public class TenantController {
         return ApiResponse.ok(tenantMapper.selectList(query));
     }
 
-    @SaCheckPermission("tenant:update")
+    @SaCheckPermission(Permissions.TENANT_UPDATE)
     @PostMapping("/{id}/approve")
     public ApiResponse<Void> approve(@PathVariable Long id) {
         Tenant tenant = requireTenant(id);
@@ -54,16 +57,16 @@ public class TenantController {
         List<SysUser> storeUsers = sysUserMapper.selectList(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getTenantId, tenant.getId())
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
-                .eq(SysUser::getDeleted, 0));
+                .eq(SysUser::getDeleted, DeleteStatus.NOT_DELETED));
         for (SysUser user : storeUsers) {
-            user.setStatus(1);
+            user.setStatus(CommonStatus.ENABLED);
             user.setUpdatedAt(now);
             sysUserMapper.updateById(user);
         }
         return ApiResponse.ok();
     }
 
-    @SaCheckPermission("tenant:update")
+    @SaCheckPermission(Permissions.TENANT_UPDATE)
     @PostMapping("/{id}/reject")
     public ApiResponse<Void> reject(@PathVariable Long id) {
         Tenant tenant = requireTenant(id);
@@ -75,7 +78,7 @@ public class TenantController {
 
     private Tenant requireTenant(Long id) {
         Tenant tenant = tenantMapper.selectById(id);
-        if (tenant == null || Integer.valueOf(1).equals(tenant.getDeleted())) {
+        if (tenant == null || Integer.valueOf(DeleteStatus.DELETED).equals(tenant.getDeleted())) {
             throw new BusinessException("租户不存在");
         }
         return tenant;

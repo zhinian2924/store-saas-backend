@@ -2,6 +2,8 @@ package com.example.storesaas.product;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.constants.CommonStatus;
+import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.product.dto.CategoryRequest;
 import com.example.storesaas.product.dto.ProductRequest;
 import com.example.storesaas.product.entity.Product;
@@ -28,7 +30,7 @@ public class ProductService {
         Long tenantId = AuthContext.tenantId();
         return categoryMapper.selectList(new LambdaQueryWrapper<ProductCategory>()
                 .eq(ProductCategory::getTenantId, tenantId)
-                .eq(ProductCategory::getDeleted, 0)
+                .eq(ProductCategory::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByAsc(ProductCategory::getSortNo));
     }
 
@@ -37,7 +39,7 @@ public class ProductService {
         category.setTenantId(AuthContext.tenantId());
         category.setName(request.name());
         category.setSortNo(request.sortNo() == null ? 0 : request.sortNo());
-        category.setStatus(request.status() == null ? 1 : request.status());
+        category.setStatus(request.status() == null ? CommonStatus.ENABLED : request.status());
         fillCreate(category);
         categoryMapper.insert(category);
         return category;
@@ -47,7 +49,7 @@ public class ProductService {
         Long tenantId = AuthContext.tenantId();
         return productMapper.selectList(new LambdaQueryWrapper<Product>()
                 .eq(Product::getTenantId, tenantId)
-                .eq(Product::getDeleted, 0)
+                .eq(Product::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByDesc(Product::getId));
     }
 
@@ -59,7 +61,7 @@ public class ProductService {
         product.setImageUrl(request.imageUrl());
         product.setPrice(request.price());
         product.setStock(request.stock());
-        product.setStatus(request.status() == null ? 1 : request.status());
+        product.setStatus(request.status() == null ? CommonStatus.ENABLED : request.status());
         fillCreate(product);
         productMapper.insert(product);
         return product;
@@ -69,7 +71,7 @@ public class ProductService {
         Product product = productMapper.selectOne(new LambdaQueryWrapper<Product>()
                 .eq(Product::getTenantId, tenantId)
                 .eq(Product::getId, productId)
-                .eq(Product::getDeleted, 0));
+                .eq(Product::getDeleted, DeleteStatus.NOT_DELETED));
         if (product == null) {
             throw new BusinessException("商品不存在");
         }
@@ -81,12 +83,12 @@ public class ProductService {
         if (entity instanceof ProductCategory category) {
             category.setCreatedAt(now);
             category.setUpdatedAt(now);
-            category.setDeleted(0);
+            category.setDeleted(DeleteStatus.NOT_DELETED);
         }
         if (entity instanceof Product product) {
             product.setCreatedAt(now);
             product.setUpdatedAt(now);
-            product.setDeleted(0);
+            product.setDeleted(DeleteStatus.NOT_DELETED);
         }
     }
 }

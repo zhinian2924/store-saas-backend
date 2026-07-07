@@ -2,6 +2,10 @@ package com.example.storesaas.payment;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.common.constants.InventoryFlowType;
+import com.example.storesaas.common.constants.OrderStatus;
+import com.example.storesaas.common.constants.PaymentStatus;
 import com.example.storesaas.inventory.InventoryService;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
@@ -40,21 +44,21 @@ public class PaymentService {
         StoreOrder order = orderMapper.selectOne(new LambdaQueryWrapper<StoreOrder>()
                 .eq(StoreOrder::getTenantId, tenantId)
                 .eq(StoreOrder::getId, orderId)
-                .eq(StoreOrder::getDeleted, 0));
+                .eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED));
         if (order == null) {
             throw new BusinessException("订单不存在");
         }
-        if ("PAID".equals(order.getStatus())) {
+        if (OrderStatus.PAID.equals(order.getStatus())) {
             return order;
         }
-        if (!"PENDING_PAY".equals(order.getStatus())) {
+        if (!OrderStatus.PENDING_PAY.equals(order.getStatus())) {
             throw new BusinessException("订单状态不允许支付");
         }
 
         List<OrderItem> items = itemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getTenantId, tenantId)
                 .eq(OrderItem::getOrderId, orderId)
-                .eq(OrderItem::getDeleted, 0));
+                .eq(OrderItem::getDeleted, DeleteStatus.NOT_DELETED));
         for (OrderItem item : items) {
             Product before = productMapper.selectById(item.getProductId());
             if (before == null || !tenantId.equals(before.getTenantId())) {
@@ -65,20 +69,20 @@ public class PaymentService {
                 throw new BusinessException(before.getName() + "库存不足");
             }
             Product after = productMapper.selectById(item.getProductId());
-            inventoryService.createFlow(tenantId, item.getProductId(), "ORDER_OUT", -item.getQuantity(), before.getStock(), after.getStock(), "订单支付扣减:" + order.getOrderNo());
+            inventoryService.createFlow(tenantId, item.getProductId(), InventoryFlowType.ORDER_OUT, -item.getQuantity(), before.getStock(), after.getStock(), "订单支付扣减:" + order.getOrderNo());
         }
 
         PaymentOrder paymentOrder = paymentOrderMapper.selectOne(new LambdaQueryWrapper<PaymentOrder>()
                 .eq(PaymentOrder::getTenantId, tenantId)
                 .eq(PaymentOrder::getOrderId, orderId)
-                .eq(PaymentOrder::getDeleted, 0)
+                .eq(PaymentOrder::getDeleted, DeleteStatus.NOT_DELETED)
                 .last("limit 1"));
         if (paymentOrder != null) {
-            paymentOrder.setStatus("SUCCESS");
+            paymentOrder.setStatus(PaymentStatus.SUCCESS);
             paymentOrder.setUpdatedAt(LocalDateTime.now());
             paymentOrderMapper.updateById(paymentOrder);
         }
-        order.setStatus("PAID");
+        order.setStatus(OrderStatus.PAID);
         order.setUpdatedAt(LocalDateTime.now());
         orderMapper.updateById(order);
         return order;

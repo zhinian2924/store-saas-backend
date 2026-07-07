@@ -2,6 +2,10 @@ package com.example.storesaas.order;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.constants.BusinessConstants;
+import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.common.constants.OrderStatus;
+import com.example.storesaas.common.constants.PaymentStatus;
 import com.example.storesaas.order.dto.CreateOrderRequest;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
@@ -50,8 +54,8 @@ public class OrderService {
         StoreOrder order = new StoreOrder();
         order.setTenantId(tenantId);
         order.setCustomerId(AuthContext.currentUser().userId());
-        order.setOrderNo(no("SO"));
-        order.setStatus("PENDING_PAY");
+        order.setOrderNo(no(BusinessConstants.ORDER_NO_PREFIX));
+        order.setStatus(OrderStatus.PENDING_PAY);
         order.setTotalAmount(total);
         fill(order);
         orderMapper.insert(order);
@@ -73,9 +77,9 @@ public class OrderService {
         PaymentOrder paymentOrder = new PaymentOrder();
         paymentOrder.setTenantId(tenantId);
         paymentOrder.setOrderId(order.getId());
-        paymentOrder.setPayNo(no("PAY"));
-        paymentOrder.setChannel("MOCK");
-        paymentOrder.setStatus("WAITING");
+        paymentOrder.setPayNo(no(BusinessConstants.PAY_NO_PREFIX));
+        paymentOrder.setChannel(BusinessConstants.PAY_CHANNEL_MOCK);
+        paymentOrder.setStatus(PaymentStatus.WAITING);
         paymentOrder.setAmount(total);
         fill(paymentOrder);
         paymentOrderMapper.insert(paymentOrder);
@@ -86,7 +90,7 @@ public class OrderService {
         Long tenantId = AuthContext.tenantId();
         return orderMapper.selectList(new LambdaQueryWrapper<StoreOrder>()
                 .eq(StoreOrder::getTenantId, tenantId)
-                .eq(StoreOrder::getDeleted, 0)
+                .eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByDesc(StoreOrder::getId));
     }
 
@@ -95,11 +99,11 @@ public class OrderService {
         return itemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getTenantId, tenantId)
                 .eq(OrderItem::getOrderId, orderId)
-                .eq(OrderItem::getDeleted, 0));
+                .eq(OrderItem::getDeleted, DeleteStatus.NOT_DELETED));
     }
 
     private String no(String prefix) {
-        return prefix + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + ThreadLocalRandom.current().nextInt(1000, 9999);
+        return prefix + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) + ThreadLocalRandom.current().nextInt(BusinessConstants.ORDER_NO_RANDOM_MIN, BusinessConstants.ORDER_NO_RANDOM_MAX);
     }
 
     private void fill(Object entity) {
@@ -107,17 +111,17 @@ public class OrderService {
         if (entity instanceof StoreOrder order) {
             order.setCreatedAt(now);
             order.setUpdatedAt(now);
-            order.setDeleted(0);
+            order.setDeleted(DeleteStatus.NOT_DELETED);
         }
         if (entity instanceof OrderItem item) {
             item.setCreatedAt(now);
             item.setUpdatedAt(now);
-            item.setDeleted(0);
+            item.setDeleted(DeleteStatus.NOT_DELETED);
         }
         if (entity instanceof PaymentOrder paymentOrder) {
             paymentOrder.setCreatedAt(now);
             paymentOrder.setUpdatedAt(now);
-            paymentOrder.setDeleted(0);
+            paymentOrder.setDeleted(DeleteStatus.NOT_DELETED);
         }
     }
 }

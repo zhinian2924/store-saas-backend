@@ -2,6 +2,8 @@ package com.example.storesaas.inventory;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.common.constants.InventoryFlowType;
 import com.example.storesaas.inventory.dto.StockAdjustRequest;
 import com.example.storesaas.inventory.entity.InventoryFlow;
 import com.example.storesaas.inventory.mapper.InventoryFlowMapper;
@@ -30,14 +32,14 @@ public class InventoryService {
         Product product = productMapper.selectOne(new LambdaQueryWrapper<Product>()
                 .eq(Product::getTenantId, tenantId)
                 .eq(Product::getId, request.productId())
-                .eq(Product::getDeleted, 0));
+                .eq(Product::getDeleted, DeleteStatus.NOT_DELETED));
         if (product == null) {
             throw new BusinessException("商品不存在");
         }
 
         int delta = switch (request.flowType()) {
-            case "PURCHASE_IN", "CHECK_GAIN" -> request.quantity();
-            case "DAMAGE_OUT", "CHECK_LOSS" -> -request.quantity();
+            case InventoryFlowType.PURCHASE_IN, InventoryFlowType.CHECK_GAIN -> request.quantity();
+            case InventoryFlowType.DAMAGE_OUT, InventoryFlowType.CHECK_LOSS -> -request.quantity();
             default -> throw new BusinessException("库存变更类型不支持");
         };
         int before = product.getStock();
@@ -63,7 +65,7 @@ public class InventoryService {
         flow.setRemark(remark);
         flow.setCreatedAt(LocalDateTime.now());
         flow.setUpdatedAt(LocalDateTime.now());
-        flow.setDeleted(0);
+        flow.setDeleted(DeleteStatus.NOT_DELETED);
         flowMapper.insert(flow);
         return flow;
     }
@@ -72,7 +74,7 @@ public class InventoryService {
         Long tenantId = AuthContext.tenantId();
         return flowMapper.selectList(new LambdaQueryWrapper<InventoryFlow>()
                 .eq(InventoryFlow::getTenantId, tenantId)
-                .eq(InventoryFlow::getDeleted, 0)
+                .eq(InventoryFlow::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByDesc(InventoryFlow::getId));
     }
 }
