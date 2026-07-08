@@ -11,6 +11,6 @@ import lombok.EqualsAndHashCode;
 public class ProductCategory extends BaseEntity {
     private Long tenantId;
     private String name;
-    private Integer sortNo;
+    private Integer sortNo;// 排序
     private Integer status;
 }

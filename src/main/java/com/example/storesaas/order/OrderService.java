@@ -6,6 +6,7 @@ import com.example.storesaas.common.constants.BusinessConstants;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
 import com.example.storesaas.common.constants.PaymentStatus;
+import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.order.dto.CreateOrderRequest;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
@@ -45,6 +46,9 @@ public class OrderService {
         BigDecimal total = BigDecimal.ZERO;
         for (CreateOrderRequest.Item item : request.items()) {
             Product product = productService.tenantProduct(tenantId, item.productId());
+            if (product.getStatus() == null || product.getStatus() != ProductStatus.ON_SALE) {
+                throw new BusinessException(product.getName() + "当前不可销售");
+            }
             if (product.getStock() < item.quantity()) {
                 throw new BusinessException(product.getName() + "库存不足");
             }

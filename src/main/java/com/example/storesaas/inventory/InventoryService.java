@@ -50,6 +50,7 @@ public class InventoryService {
         product.setStock(after);
         product.setUpdatedAt(LocalDateTime.now());
         productMapper.updateById(product);
+        productMapper.syncStatusByStock(tenantId, product.getId());
 
         return createFlow(tenantId, product.getId(), request.flowType(), delta, before, after, request.remark());
     }

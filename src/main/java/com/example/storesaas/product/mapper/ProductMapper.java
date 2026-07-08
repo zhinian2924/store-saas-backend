@@ -15,4 +15,27 @@ public interface ProductMapper extends BaseMapper<Product> {
               and deleted = 0
             """)
     int deductStock(@Param("tenantId") Long tenantId, @Param("productId") Long productId, @Param("quantity") Integer quantity);
+
+    @Update("""
+            update biz_product
+            set status = case
+                    when stock <= 0 and status = 1 then 2
+                    when stock > 0 and status = 2 then 1
+                    else status
+                end,
+                updated_at = now()
+            where id = #{productId}
+              and tenant_id = #{tenantId}
+              and deleted = 0
+            """)
+    int syncStatusByStock(@Param("tenantId") Long tenantId, @Param("productId") Long productId);
+
+    @Update("""
+            update biz_product
+            set status = 3, updated_at = now()
+            where tenant_id = #{tenantId}
+              and category_id = #{categoryId}
+              and deleted = 0
+            """)
+    int stopByCategory(@Param("tenantId") Long tenantId, @Param("categoryId") Long categoryId);
 }

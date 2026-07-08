@@ -11,7 +11,7 @@ public record ProductRequest(
         @NotBlank String name,
         String imageUrl,
         @NotNull @DecimalMin("0.01") BigDecimal price,
-        @NotNull @Min(0) Integer stock,
+        @Min(0) Integer stock,
         Integer status
 ) {
 }

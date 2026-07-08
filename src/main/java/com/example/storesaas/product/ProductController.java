@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/store")
@@ -43,5 +44,30 @@ public class ProductController {
     @PostMapping("/products")
     public ApiResponse<Product> createProduct(@Valid @RequestBody ProductRequest request) {
         return ApiResponse.ok(productService.createProduct(request));
+    }
+
+    @SaCheckPermission(Permissions.PRODUCT_UPDATE)
+    @PutMapping("/products/{id}")
+    public ApiResponse<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+        return ApiResponse.ok(productService.updateProduct(id, request));
+    }
+
+    @SaCheckPermission(Permissions.PRODUCT_UPDATE)
+    @PutMapping("/products/{id}/status")
+    public ApiResponse<Product> updateProductStatus(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
+        return ApiResponse.ok(productService.setProductStatus(id, request.get("status")));
+    }
+
+    @SaCheckPermission(Permissions.PRODUCT_UPDATE)
+    @PutMapping("/categories/{id}/status")
+    public ApiResponse<ProductCategory> updateCategoryStatus(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
+        return ApiResponse.ok(productService.setCategoryStatus(id, request.get("status")));
+    }
+
+    @SaCheckPermission(Permissions.PRODUCT_UPDATE)
+    @DeleteMapping("/products/{id}")
+    public ApiResponse<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ApiResponse.ok(null);
     }
 }

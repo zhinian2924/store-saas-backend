@@ -6,6 +6,7 @@ import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.InventoryFlowType;
 import com.example.storesaas.common.constants.OrderStatus;
 import com.example.storesaas.common.constants.PaymentStatus;
+import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.inventory.InventoryService;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
@@ -64,10 +65,14 @@ public class PaymentService {
             if (before == null || !tenantId.equals(before.getTenantId())) {
                 throw new BusinessException("商品不存在");
             }
+            if (before.getStatus() == null || before.getStatus() != ProductStatus.ON_SALE) {
+                throw new BusinessException(before.getName() + "当前不可销售");
+            }
             int affected = productMapper.deductStock(tenantId, item.getProductId(), item.getQuantity());
             if (affected != 1) {
                 throw new BusinessException(before.getName() + "库存不足");
             }
+            productMapper.syncStatusByStock(tenantId, item.getProductId());
             Product after = productMapper.selectById(item.getProductId());
             inventoryService.createFlow(tenantId, item.getProductId(), InventoryFlowType.ORDER_OUT, -item.getQuantity(), before.getStock(), after.getStock(), "订单支付扣减:" + order.getOrderNo());
         }
