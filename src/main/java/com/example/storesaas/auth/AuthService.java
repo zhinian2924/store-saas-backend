@@ -257,9 +257,9 @@ public class AuthService {
     }
 
     /**
-     * 生成门店管理员用户名
+     * 生成门店店主用户名
      * @param tenantId 门店ID
-     * @return 用户名
+     * @return 店主用户名
      */
     private String generateStoreOwnerUsername(Long tenantId) {
         return BusinessConstants.STORE_USERNAME_PREFIX + tenantId;

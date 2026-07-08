@@ -53,6 +53,11 @@ public final class StaffPermissions {
         return OWNER;
     }
 
+    /**
+     * 默认权限
+     * @param role 角色
+     * @return 权限列表
+     */
     public static List<String> defaults(String role) {
         StaffRole staffRole = parseRole(role);
         return switch (staffRole) {
@@ -63,6 +68,12 @@ public final class StaffPermissions {
         };
     }
 
+    /**
+     * 解析权限
+     * @param permissions 权限字符串
+     * @param role 角色
+     * @return 权限列表
+     */
     public static List<String> parse(String permissions, String role) {
         if (permissions == null || permissions.isBlank()) {
             return defaults(role);
@@ -75,6 +86,11 @@ public final class StaffPermissions {
                 .toList();
     }
 
+    /**
+     * 拼接权限
+     * @param permissions 权限列表
+     * @return 权限字符串
+     */
     public static String join(List<String> permissions) {
         if (permissions == null || permissions.isEmpty()) {
             return "";
@@ -85,6 +101,11 @@ public final class StaffPermissions {
                 .toList());
     }
 
+    /**
+     * 拼接可授权权限
+     * @param permissions 权限列表
+     * @return 权限字符串
+     */
     public static String joinGrantable(List<String> permissions) {
         if (permissions == null || permissions.isEmpty()) {
             return "";
