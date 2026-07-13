@@ -116,9 +116,16 @@ public class AuthService {
         }
         String code = String.valueOf(ThreadLocalRandom.current().nextInt(BusinessConstants.SMS_CODE_RANGE_MIN, BusinessConstants.SMS_CODE_RANGE_MAX));
         stringRedisTemplate.opsForValue().set(RedisKeys.storeSmsCode(request.mobile()), code, SMS_CODE_TTL);
+        System.out.println("SMS Code: " + code);
         return new SmsCodeResponse(request.mobile(), (int) SMS_CODE_TTL.toSeconds(), code);
     }
 
+    /**
+     * 登录
+     * @param request 登录请求
+     * @param accountType 账号类型
+     * @return 登录响应
+     */
     public LoginResponse login(LoginRequest request, AccountType accountType) {
         SysUser user = accountType == AccountType.STORE ? storeLogin(request) : platformLogin(request, accountType);
         if (accountType == AccountType.STORE) {
@@ -133,6 +140,10 @@ public class AuthService {
         return doLogin(user, permissions);
     }
 
+    /**
+     * 获取当前登录用户
+     * @return 当前登录用户
+     */
     public AccountProfileResponse me() {
         return AccountProfileResponse.from(currentUser());
     }

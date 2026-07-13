@@ -11,4 +11,5 @@ spring:
 
 logging:
   level:
-    root: debug
+    root: warn   # 设置根日志级别为warn，可选值有trace, debug, info, warn, error, fatal
+    com.example.storesaas: debug
