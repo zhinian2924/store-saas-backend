@@ -43,7 +43,6 @@ storage:
   minio:
     enabled: ${MINIO_ENABLED}
     endpoint: ${MINIO_ENDPOINT}
-    public-endpoint: ${MINIO_PUBLIC_ENDPOINT:${MINIO_ENDPOINT}}
     access-key: ${MINIO_ACCESS_KEY}
     secret-key: ${MINIO_SECRET_KEY}
     bucket: ${MINIO_BUCKET}

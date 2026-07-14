@@ -13,7 +13,6 @@ storage:
   minio:
     enabled: true
     endpoint: http://192.168.85.202:9000
-    public-endpoint: http://192.168.85.202:9000
     access-key: admin
     secret-key: admin123
     bucket: store-images

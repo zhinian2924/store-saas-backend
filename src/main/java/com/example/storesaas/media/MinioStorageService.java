@@ -28,7 +28,7 @@ public class MinioStorageService {
     private boolean enabled;
     @Value("${storage.minio.endpoint:http://localhost:9000}")
     private String endpoint;
-    @Value("${storage.minio.public-endpoint:${storage.minio.endpoint:http://localhost:9000}}")
+    @Value("${storage.minio.public-endpoint:${storage.minio.endpoint:http://localhost:9000}}") // 不配置则使用 endpoint
     private String publicEndpoint;
     @Value("${storage.minio.access-key:minioadmin}")
     private String accessKey;
@@ -39,7 +39,7 @@ public class MinioStorageService {
 
     private MinioClient client;
 
-    @PostConstruct
+    @PostConstruct  // 初始化方法，在依赖注入完成后调用
     void initialize() {
         if (!enabled) {
             return;
@@ -110,6 +110,9 @@ public class MinioStorageService {
         }
     }
 
+    /**
+     * 确保图片存储服务已启用
+     */
     private void ensureEnabled() {
         if (!enabled || client == null) {
             throw new BusinessException("图片存储未配置");
