@@ -6,7 +6,13 @@ spring:
     name: store-saas-backend
   profiles:
     active: dev
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
+# MyBatis-Plus 配置
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
@@ -16,6 +22,7 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
+# Sa-Token 配置
 sa-token:
   token-name: Authorization
   token-prefix: Bearer
@@ -26,6 +33,17 @@ sa-token:
   token-style: uuid
   is-log: true
 
+# Swagger UI 配置
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+# MinIO 配置
+storage:
+  minio:
+    enabled: ${MINIO_ENABLED}
+    endpoint: ${MINIO_ENDPOINT}
+    public-endpoint: ${MINIO_PUBLIC_ENDPOINT:${MINIO_ENDPOINT}}
+    access-key: ${MINIO_ACCESS_KEY}
+    secret-key: ${MINIO_SECRET_KEY}
+    bucket: ${MINIO_BUCKET}

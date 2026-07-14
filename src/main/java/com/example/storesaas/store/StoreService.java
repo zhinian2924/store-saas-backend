@@ -3,6 +3,7 @@ package com.example.storesaas.store;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.media.MinioStorageService;
 import com.example.storesaas.security.AuthContext;
 import com.example.storesaas.store.dto.StoreProfileRequest;
 import com.example.storesaas.store.entity.Store;
@@ -18,10 +19,12 @@ import java.time.LocalDateTime;
 public class StoreService {
     private final StoreMapper storeMapper;
     private final TenantMapper tenantMapper;
+    private final MinioStorageService storageService;
 
-    public StoreService(StoreMapper storeMapper, TenantMapper tenantMapper) {
+    public StoreService(StoreMapper storeMapper, TenantMapper tenantMapper, MinioStorageService storageService) {
         this.storeMapper = storeMapper;
         this.tenantMapper = tenantMapper;
+        this.storageService = storageService;
     }
 
     public Store profile() {
@@ -35,6 +38,7 @@ public class StoreService {
         store.setName(request.name());
         store.setAddress(request.address());
         store.setBusinessHours(request.businessHours());
+        String oldLogoUrl = store.getLogoUrl();
         store.setLogoUrl(request.logoUrl());
         store.setUpdatedAt(now);
         storeMapper.updateById(store);
@@ -44,6 +48,9 @@ public class StoreService {
             tenant.setName(request.name());
             tenant.setUpdatedAt(now);
             tenantMapper.updateById(tenant);
+        }
+        if (!java.util.Objects.equals(oldLogoUrl, request.logoUrl())) {
+            storageService.deleteUrl(oldLogoUrl);
         }
         return store;
     }

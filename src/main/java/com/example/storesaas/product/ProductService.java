@@ -5,6 +5,7 @@ import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.media.MinioStorageService;
 import com.example.storesaas.product.dto.CategoryRequest;
 import com.example.storesaas.product.dto.ProductRequest;
 import com.example.storesaas.product.entity.Product;
@@ -21,10 +22,12 @@ import java.util.List;
 public class ProductService {
     private final ProductCategoryMapper categoryMapper;
     private final ProductMapper productMapper;
+    private final MinioStorageService storageService;
 
-    public ProductService(ProductCategoryMapper categoryMapper, ProductMapper productMapper) {
+    public ProductService(ProductCategoryMapper categoryMapper, ProductMapper productMapper, MinioStorageService storageService) {
         this.categoryMapper = categoryMapper;
         this.productMapper = productMapper;
+        this.storageService = storageService;
     }
 
     /**
@@ -83,6 +86,7 @@ public class ProductService {
 
     public Product updateProduct(Long id, ProductRequest request) {
         Product product = tenantProduct(AuthContext.tenantId(), id);
+        String oldImageUrl = product.getImageUrl();
         product.setCategoryId(request.categoryId());
         product.setName(request.name());
         product.setImageUrl(request.imageUrl());
@@ -90,6 +94,9 @@ public class ProductService {
         product.setStatus(normalizeProductStatus(request.status(), product.getStock()));
         product.setUpdatedAt(LocalDateTime.now());
         productMapper.updateById(product);
+        if (!java.util.Objects.equals(oldImageUrl, request.imageUrl())) {
+            storageService.deleteUrl(oldImageUrl);
+        }
         return product;
     }
 
@@ -125,6 +132,7 @@ public class ProductService {
         product.setDeleted(DeleteStatus.DELETED);
         product.setUpdatedAt(LocalDateTime.now());
         productMapper.updateById(product);
+        storageService.deleteUrl(product.getImageUrl());
     }
 
     public Product tenantProduct(Long tenantId, Long productId) {

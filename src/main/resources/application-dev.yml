@@ -9,6 +9,15 @@ spring:
       port: 6379
       password: admin123
 
+storage:
+  minio:
+    enabled: true
+    endpoint: http://192.168.85.202:9000
+    public-endpoint: http://192.168.85.202:9000
+    access-key: admin
+    secret-key: admin123
+    bucket: store-images
+
 logging:
   level:
     root: warn   # 设置根日志级别为warn，可选值有trace, debug, info, warn, error, fatal
