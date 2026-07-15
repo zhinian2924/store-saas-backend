@@ -11,7 +11,17 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MiniPaymentService {
-    private final StoreOrderMapper orders; private final PaymentService payments;
-    public MiniPaymentService(StoreOrderMapper o, PaymentService p){orders=o;payments=p;}
-    public StoreOrder mock(Long id){StoreOrder o=orders.selectOne(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTenantId,CustomerContext.tenantId()).eq(StoreOrder::getCustomerId,CustomerContext.customerId()).eq(StoreOrder::getId,id).eq(StoreOrder::getDeleted,DeleteStatus.NOT_DELETED));if(o==null)throw new BusinessException("订单不存在");return payments.mockPay(id);}
+    private final StoreOrderMapper orders;
+    private final PaymentService payments;
+
+    public MiniPaymentService(StoreOrderMapper o, PaymentService p) {
+        orders = o;
+        payments = p;
+    }
+
+    public StoreOrder mock(Long id) {
+        StoreOrder o = orders.selectOne(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTenantId, CustomerContext.tenantId()).eq(StoreOrder::getCustomerId, CustomerContext.customerId()).eq(StoreOrder::getId, id).eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED));
+        if (o == null) throw new BusinessException("订单不存在");
+        return payments.mockPay(id);
+    }
 }

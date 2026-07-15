@@ -5,9 +5,12 @@ import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.AuthContext;
 import com.example.storesaas.security.LoginUser;
 
-/** Central guard for every mini-program endpoint. */
+/**
+ * Central guard for every mini-program endpoint.
+ */
 public final class CustomerContext {
-    private CustomerContext() {}
+    private CustomerContext() {
+    }
 
     public static LoginUser current() {
         LoginUser user = AuthContext.currentUser();
@@ -17,6 +20,11 @@ public final class CustomerContext {
         return user;
     }
 
-    public static Long customerId() { return current().userId(); }
-    public static Long tenantId() { return current().tenantId(); }
+    public static Long customerId() {
+        return current().userId();
+    }
+
+    public static Long tenantId() {
+        return current().tenantId();
+    }
 }

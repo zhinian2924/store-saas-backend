@@ -9,6 +9,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/mini/payments")
 public class MiniPaymentController {
     private final MiniPaymentService service;
-    public MiniPaymentController(MiniPaymentService service){this.service=service;}
-    @PostMapping("/mock/{orderId}") public ApiResponse<StoreOrder> mock(@PathVariable Long orderId){CustomerContext.current();return ApiResponse.ok(service.mock(orderId));}
+
+    public MiniPaymentController(MiniPaymentService service) {
+        this.service = service;
+    }
+
+    @PostMapping("/mock/{orderId}")
+    public ApiResponse<StoreOrder> mock(@PathVariable Long orderId) {
+        CustomerContext.current();
+        return ApiResponse.ok(service.mock(orderId));
+    }
 }
