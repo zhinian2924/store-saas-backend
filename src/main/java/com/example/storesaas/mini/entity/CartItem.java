@@ -1,22 +1,18 @@
-package com.example.storesaas.order.entity;
+package com.example.storesaas.mini.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.storesaas.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-
 import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
-@TableName("biz_order_item")
+@TableName("biz_cart_item")
 @Data
-public class OrderItem extends BaseEntity {
+public class CartItem extends BaseEntity {
     private Long tenantId;
-    private Long orderId;
+    private Long customerId;
     private Long productId;
-    private String productName;
-    private String imageUrl;
-    private BigDecimal price;
     private Integer quantity;
-    private BigDecimal amount;
+    private BigDecimal price;
 }

@@ -24,7 +24,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new SaInterceptor(handler -> SaRouter.match("/**")
-                        .notMatch(ApiRoutes.AUTH + "/**", ApiRoutes.MINI_AUTH, "/v3/api-docs/**",
+                        .notMatch(ApiRoutes.AUTH + "/**", ApiRoutes.MINI_AUTH, ApiRoutes.MINI_PUBLIC, "/v3/api-docs/**",
                                 "/swagger-ui/**", "/swagger-ui.html")
                         .check(StpUtil::checkLogin)))
                 .addPathPatterns("/**");

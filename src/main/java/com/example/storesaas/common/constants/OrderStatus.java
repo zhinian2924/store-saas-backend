@@ -7,6 +7,7 @@ public final class OrderStatus {
 
     public static final String PENDING_PAY = "PENDING_PAY";// 待支付
     public static final String PAID = "PAID";// 已支付
+    public static final String CANCELLED = "CANCELLED";// 已取消
 
     private OrderStatus() {
     }

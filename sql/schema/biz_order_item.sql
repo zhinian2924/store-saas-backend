@@ -5,6 +5,7 @@ create table if not exists biz_order_item (
   order_id bigint not null comment '订单ID',
   product_id bigint not null comment '商品ID',
   product_name varchar(128) not null comment '商品名称（快照）',
+  image_url varchar(255) comment '商品图片',
   price decimal(10,2) not null comment '单价',
   quantity int not null comment '数量',
   amount decimal(10,2) not null comment '小计金额',

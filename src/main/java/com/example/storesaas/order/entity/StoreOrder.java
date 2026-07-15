@@ -16,4 +16,9 @@ public class StoreOrder extends BaseEntity {
     private String orderNo;
     private String status;
     private BigDecimal totalAmount;
+    private String fulfillmentType;
+    private String addressSnapshot;
+    private String remark;
+    private BigDecimal deliveryFee;
+    private String source;
 }
