@@ -1,7 +1,7 @@
 package com.example.storesaas.mini;
 
 import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.mini.dto.MockLoginRequest;
+import com.example.storesaas.mini.dto.WechatLoginRequest;
 import com.example.storesaas.mini.service.MiniAuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,9 @@ public class MiniAuthController {
         this.service = service;
     }
 
-    @PostMapping("/mock-login")
-    public ApiResponse<Map<String, Object>> login(@Valid @RequestBody MockLoginRequest r) {
-        return ApiResponse.ok(service.mockLogin(r));
+    @PostMapping("/wechat-login")
+    public ApiResponse<Map<String, Object>> login(@Valid @RequestBody WechatLoginRequest request) {
+        return ApiResponse.ok(service.wechatLogin(request));
     }
 
     @GetMapping("/me")

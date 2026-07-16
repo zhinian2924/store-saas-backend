@@ -40,6 +40,7 @@ public class StoreService {
         store.setBusinessHours(request.businessHours());
         String oldLogoUrl = store.getLogoUrl();
         store.setLogoUrl(request.logoUrl());
+        store.setThemeColor(request.themeColor() == null ? "#0F766E" : request.themeColor().toUpperCase());
         store.setUpdatedAt(now);
         storeMapper.updateById(store);
 

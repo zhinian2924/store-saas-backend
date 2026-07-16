@@ -70,3 +70,9 @@ build/
 
 # Docker
 .docker/
+
+# Test
+src/test/
+
+# SQL
+sql/migration/

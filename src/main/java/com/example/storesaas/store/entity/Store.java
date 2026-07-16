@@ -14,4 +14,5 @@ public class Store extends BaseEntity {
     private String address;// 地址
     private String businessHours;// 营业时间
     private String logoUrl;// logo图片地址
+    private String themeColor;// 小程序主题色
 }

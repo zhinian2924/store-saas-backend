@@ -2,6 +2,7 @@ package com.example.storesaas.store.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 
 public record StoreProfileRequest(
         @NotBlank(message = "请输入门店名称")
@@ -15,6 +16,9 @@ public record StoreProfileRequest(
         String businessHours,
 
         @Size(max = 255, message = "LOGO地址不能超过255个字符")
-        String logoUrl
+        String logoUrl,
+
+        @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "主题色必须是#开头的六位十六进制颜色")
+        String themeColor
 ) {
 }

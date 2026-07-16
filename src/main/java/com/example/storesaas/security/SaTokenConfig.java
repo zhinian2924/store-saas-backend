@@ -5,6 +5,7 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.common.constants.ApiRoutes;
+import com.example.storesaas.mini.MiniCustomerGuardInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -16,6 +17,11 @@ import java.util.List;
 
 @Configuration
 public class SaTokenConfig implements WebMvcConfigurer {
+    private final MiniCustomerGuardInterceptor miniCustomerGuard;
+
+    public SaTokenConfig(MiniCustomerGuardInterceptor miniCustomerGuard) {
+        this.miniCustomerGuard = miniCustomerGuard;
+    }
 
     /**
      * 配置 SaToken 拦截器
@@ -28,6 +34,9 @@ public class SaTokenConfig implements WebMvcConfigurer {
                                 "/swagger-ui/**", "/swagger-ui.html")
                         .check(StpUtil::checkLogin)))
                 .addPathPatterns("/**");
+        registry.addInterceptor(miniCustomerGuard)
+                .addPathPatterns("/api/mini/**")
+                .excludePathPatterns("/api/mini/auth/**", "/api/mini/public/**");
     }
 
     /**

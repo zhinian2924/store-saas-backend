@@ -11,3 +11,6 @@ spring:
 logging:
   level:
     root: warn
+
+miniapp:
+  secret-key: ${MINIAPP_SECRET_KEY}

@@ -21,3 +21,7 @@ logging:
   level:
     root: warn   # 设置根日志级别为warn，可选值有trace, debug, info, warn, error, fatal
     com.example.storesaas: debug
+
+miniapp:
+  # 仅供本地开发。生产环境必须通过MINIAPP_SECRET_KEY提供独立的32字节Base64密钥。
+  secret-key: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
