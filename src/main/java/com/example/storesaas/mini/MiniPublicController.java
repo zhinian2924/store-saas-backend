@@ -8,7 +8,9 @@ import com.example.storesaas.product.entity.Product;
 import com.example.storesaas.product.entity.ProductCategory;
 import com.example.storesaas.product.mapper.ProductCategoryMapper;
 import com.example.storesaas.product.mapper.ProductMapper;
-import com.example.storesaas.mini.dto.PublicStoreResponse;
+import com.example.storesaas.mini.vo.PublicStoreVO;
+import com.example.storesaas.mini.vo.PublicCategoryVO;
+import com.example.storesaas.mini.vo.PublicProductVO;
 import com.example.storesaas.miniappconfig.MiniappConfigService;
 import com.example.storesaas.store.entity.Store;
 import com.example.storesaas.store.mapper.StoreMapper;
@@ -32,27 +34,28 @@ public class MiniPublicController {
     }
 
     @GetMapping("/store")
-    public ApiResponse<PublicStoreResponse> store(@RequestParam String appId) {
+    public ApiResponse<PublicStoreVO> store(@RequestParam String appId) {
         Long tenantId = tenantId(appId);
         Store store = stores.selectOne(new LambdaQueryWrapper<Store>().eq(Store::getTenantId, tenantId)
                 .eq(Store::getDeleted, DeleteStatus.NOT_DELETED).last("limit 1"));
         if (store == null) return ApiResponse.ok(null);
-        return ApiResponse.ok(new PublicStoreResponse(store.getName(), store.getLogoUrl(),
+        return ApiResponse.ok(new PublicStoreVO(store.getName(), store.getLogoUrl(),
                 store.getThemeColor(), store.getBusinessHours()));
     }
 
     @GetMapping("/categories")
-    public ApiResponse<List<ProductCategory>> categories(@RequestParam String appId) {
+    public ApiResponse<List<PublicCategoryVO>> categories(@RequestParam String appId) {
         Long tenantId = tenantId(appId);
-        return ApiResponse.ok(categories.selectList(new LambdaQueryWrapper<ProductCategory>().eq(ProductCategory::getTenantId, tenantId).eq(ProductCategory::getStatus, 1).eq(ProductCategory::getDeleted, 0).orderByAsc(ProductCategory::getSortNo)));
+        return ApiResponse.ok(categories.selectList(new LambdaQueryWrapper<ProductCategory>().eq(ProductCategory::getTenantId, tenantId).eq(ProductCategory::getStatus, 1).eq(ProductCategory::getDeleted, 0).orderByAsc(ProductCategory::getSortNo))
+                .stream().map(PublicCategoryVO::from).toList());
     }
 
     @GetMapping("/products")
-    public ApiResponse<List<Product>> products(@RequestParam String appId, @RequestParam(required = false) Long categoryId) {
+    public ApiResponse<List<PublicProductVO>> products(@RequestParam String appId, @RequestParam(required = false) Long categoryId) {
         Long tenantId = tenantId(appId);
         var q = new LambdaQueryWrapper<Product>().eq(Product::getTenantId, tenantId).eq(Product::getStatus, ProductStatus.ON_SALE).gt(Product::getStock, 0).eq(Product::getDeleted, 0);
         if (categoryId != null) q.eq(Product::getCategoryId, categoryId);
-        return ApiResponse.ok(products.selectList(q));
+        return ApiResponse.ok(products.selectList(q).stream().map(PublicProductVO::from).toList());
     }
 
     private Long tenantId(String appId) {

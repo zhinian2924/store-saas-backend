@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.mini.CustomerContext;
-import com.example.storesaas.mini.dto.CartItemRequest;
+import com.example.storesaas.mini.dto.CartItemDTO;
 import com.example.storesaas.mini.entity.CartItem;
 import com.example.storesaas.mini.mapper.CartItemMapper;
+import com.example.storesaas.mini.vo.CartItemVO;
 import com.example.storesaas.product.ProductService;
 import com.example.storesaas.product.entity.Product;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,12 @@ public class CartService {
         this.products = products;
     }
 
-    public List<CartItem> list() {
-        return mapper.selectList(query());
+    public List<CartItemVO> list() {
+        return mapper.selectList(query()).stream().map(CartItemVO::from).toList();
     }
 
     @Transactional
-    public CartItem add(Long productId, CartItemRequest request) {
+    public CartItemVO add(Long productId, CartItemDTO request) {
         Long tenantId = CustomerContext.tenantId();
         Product product = products.tenantProduct(tenantId, productId);
         if (product.getStatus() == null || product.getStatus() != 1) throw new BusinessException("商品当前不可购买");
@@ -50,16 +51,16 @@ public class CartService {
             item.setUpdatedAt(LocalDateTime.now());
             mapper.updateById(item);
         }
-        return item;
+        return CartItemVO.from(item);
     }
 
     @Transactional
-    public CartItem update(Long productId, CartItemRequest request) {
+    public CartItemVO update(Long productId, CartItemDTO request) {
         CartItem item = owned(productId);
         item.setQuantity(request.quantity());
         item.setUpdatedAt(LocalDateTime.now());
         mapper.updateById(item);
-        return item;
+        return CartItemVO.from(item);
     }
 
     @Transactional

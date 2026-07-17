@@ -5,8 +5,8 @@ import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.ResultCode;
-import com.example.storesaas.miniappconfig.dto.MiniappConfigRequest;
-import com.example.storesaas.miniappconfig.dto.MiniappConfigResponse;
+import com.example.storesaas.miniappconfig.dto.MiniappConfigDTO;
+import com.example.storesaas.miniappconfig.vo.MiniappConfigVO;
 import com.example.storesaas.miniappconfig.entity.MiniappConfig;
 import com.example.storesaas.miniappconfig.mapper.MiniappConfigMapper;
 import com.example.storesaas.security.AccountType;
@@ -31,16 +31,16 @@ public class MiniappConfigService {
         this.secretCipher = secretCipher;
     }
 
-    public MiniappConfigResponse get(Long tenantId) {
+    public MiniappConfigVO get(Long tenantId) {
         requirePlatform();
         requireTenant(tenantId, false);
         MiniappConfig config = findByTenant(tenantId);
-        if (config == null) return new MiniappConfigResponse(tenantId, null, false, null, null, null);
+        if (config == null) return new MiniappConfigVO(tenantId, null, false, null, null, null);
         return response(config);
     }
 
     @Transactional
-    public MiniappConfigResponse save(Long tenantId, MiniappConfigRequest request) {
+    public MiniappConfigVO save(Long tenantId, MiniappConfigDTO request) {
         Long operatorId = requirePlatform();
         requireTenant(tenantId, false);
         String appId = request.appId().trim();
@@ -71,7 +71,7 @@ public class MiniappConfigService {
     }
 
     @Transactional
-    public MiniappConfigResponse setStatus(Long tenantId, Integer status) {
+    public MiniappConfigVO setStatus(Long tenantId, Integer status) {
         Long operatorId = requirePlatform();
         if (!Integer.valueOf(CommonStatus.ENABLED).equals(status)
                 && !Integer.valueOf(CommonStatus.DISABLED).equals(status)) {
@@ -140,8 +140,8 @@ public class MiniappConfigService {
         return user.userId();
     }
 
-    private MiniappConfigResponse response(MiniappConfig config) {
-        return new MiniappConfigResponse(config.getTenantId(), config.getAppId(),
+    private MiniappConfigVO response(MiniappConfig config) {
+        return new MiniappConfigVO(config.getTenantId(), config.getAppId(),
                 config.getAppSecretCiphertext() != null && !config.getAppSecretCiphertext().isBlank(),
                 config.getStatus(), config.getUpdatedBy(), config.getUpdatedAt());
     }

@@ -7,11 +7,13 @@ import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
 import com.example.storesaas.common.constants.PaymentStatus;
 import com.example.storesaas.common.constants.ProductStatus;
-import com.example.storesaas.order.dto.CreateOrderRequest;
+import com.example.storesaas.order.dto.CreateOrderDTO;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.mapper.OrderItemMapper;
 import com.example.storesaas.order.mapper.StoreOrderMapper;
+import com.example.storesaas.order.vo.OrderItemVO;
+import com.example.storesaas.order.vo.OrderVO;
 import com.example.storesaas.payment.entity.PaymentOrder;
 import com.example.storesaas.payment.mapper.PaymentOrderMapper;
 import com.example.storesaas.product.ProductService;
@@ -41,10 +43,10 @@ public class OrderService {
     }
 
     @Transactional
-    public StoreOrder create(CreateOrderRequest request) {
+    public OrderVO create(CreateOrderDTO request) {
         Long tenantId = AuthContext.tenantId();
         BigDecimal total = BigDecimal.ZERO;
-        for (CreateOrderRequest.Item item : request.items()) {
+        for (CreateOrderDTO.Item item : request.items()) {
             Product product = productService.tenantProduct(tenantId, item.productId());
             if (product.getStatus() == null || product.getStatus() != ProductStatus.ON_SALE) {
                 throw new BusinessException(product.getName() + "当前不可销售");
@@ -64,7 +66,7 @@ public class OrderService {
         fill(order);
         orderMapper.insert(order);
 
-        for (CreateOrderRequest.Item requestItem : request.items()) {
+        for (CreateOrderDTO.Item requestItem : request.items()) {
             Product product = productService.tenantProduct(tenantId, requestItem.productId());
             OrderItem item = new OrderItem();
             item.setTenantId(tenantId);
@@ -87,23 +89,23 @@ public class OrderService {
         paymentOrder.setAmount(total);
         fill(paymentOrder);
         paymentOrderMapper.insert(paymentOrder);
-        return order;
+        return OrderVO.from(order);
     }
 
-    public List<StoreOrder> list() {
+    public List<OrderVO> list() {
         Long tenantId = AuthContext.tenantId();
         return orderMapper.selectList(new LambdaQueryWrapper<StoreOrder>()
                 .eq(StoreOrder::getTenantId, tenantId)
                 .eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED)
-                .orderByDesc(StoreOrder::getId));
+                .orderByDesc(StoreOrder::getId)).stream().map(OrderVO::from).toList();
     }
 
-    public List<OrderItem> items(Long orderId) {
+    public List<OrderItemVO> items(Long orderId) {
         Long tenantId = AuthContext.tenantId();
         return itemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
                 .eq(OrderItem::getTenantId, tenantId)
                 .eq(OrderItem::getOrderId, orderId)
-                .eq(OrderItem::getDeleted, DeleteStatus.NOT_DELETED));
+                .eq(OrderItem::getDeleted, DeleteStatus.NOT_DELETED)).stream().map(OrderItemVO::from).toList();
     }
 
     private String no(String prefix) {

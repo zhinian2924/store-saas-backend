@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.InventoryFlowType;
-import com.example.storesaas.inventory.dto.StockAdjustRequest;
+import com.example.storesaas.inventory.dto.StockAdjustDTO;
 import com.example.storesaas.inventory.entity.InventoryFlow;
 import com.example.storesaas.inventory.mapper.InventoryFlowMapper;
+import com.example.storesaas.inventory.vo.InventoryFlowVO;
 import com.example.storesaas.product.entity.Product;
 import com.example.storesaas.product.mapper.ProductMapper;
 import com.example.storesaas.security.AuthContext;
@@ -27,7 +28,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public InventoryFlow adjust(StockAdjustRequest request) {
+    public InventoryFlowVO adjust(StockAdjustDTO request) {
         Long tenantId = AuthContext.tenantId();
         Product product = productMapper.selectOne(new LambdaQueryWrapper<Product>()
                 .eq(Product::getTenantId, tenantId)
@@ -52,7 +53,7 @@ public class InventoryService {
         productMapper.updateById(product);
         productMapper.syncStatusByStock(tenantId, product.getId());
 
-        return createFlow(tenantId, product.getId(), request.flowType(), delta, before, after, request.remark());
+        return InventoryFlowVO.from(createFlow(tenantId, product.getId(), request.flowType(), delta, before, after, request.remark()));
     }
 
     public InventoryFlow createFlow(Long tenantId, Long productId, String flowType, Integer quantity, Integer before, Integer after, String remark) {
@@ -71,11 +72,11 @@ public class InventoryService {
         return flow;
     }
 
-    public List<InventoryFlow> flows() {
+    public List<InventoryFlowVO> flows() {
         Long tenantId = AuthContext.tenantId();
         return flowMapper.selectList(new LambdaQueryWrapper<InventoryFlow>()
                 .eq(InventoryFlow::getTenantId, tenantId)
                 .eq(InventoryFlow::getDeleted, DeleteStatus.NOT_DELETED)
-                .orderByDesc(InventoryFlow::getId));
+                .orderByDesc(InventoryFlow::getId)).stream().map(InventoryFlowVO::from).toList();
     }
 }

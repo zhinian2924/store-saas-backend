@@ -3,13 +3,13 @@ package com.example.storesaas.auth;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.auth.dto.AccountProfileResponse;
-import com.example.storesaas.auth.dto.AccountProfileUpdateRequest;
-import com.example.storesaas.auth.dto.LoginRequest;
-import com.example.storesaas.auth.dto.LoginResponse;
-import com.example.storesaas.auth.dto.RegisterTenantRequest;
-import com.example.storesaas.auth.dto.SmsCodeRequest;
-import com.example.storesaas.auth.dto.SmsCodeResponse;
+import com.example.storesaas.auth.vo.AccountProfileVO;
+import com.example.storesaas.auth.dto.AccountProfileUpdateDTO;
+import com.example.storesaas.auth.dto.LoginDTO;
+import com.example.storesaas.auth.vo.LoginVO;
+import com.example.storesaas.auth.dto.RegisterTenantDTO;
+import com.example.storesaas.auth.dto.SmsCodeDTO;
+import com.example.storesaas.auth.vo.SmsCodeVO;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.BusinessConstants;
 import com.example.storesaas.common.constants.CommonStatus;
@@ -57,7 +57,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void registerTenant(RegisterTenantRequest request) {
+    public void registerTenant(RegisterTenantDTO request) {
         Long mobileCount = sysUserMapper.selectCount(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
                 .eq(SysUser::getMobile, request.mobile())
@@ -108,7 +108,7 @@ public class AuthService {
      * @param request 短信验证码请求
      * @return 短信验证码响应
      */
-    public SmsCodeResponse sendStoreSmsCode(SmsCodeRequest request) {
+    public SmsCodeVO sendStoreSmsCode(SmsCodeDTO request) {
         SysUser user = findStoreUserByMobile(request.mobile());
         ensureTenantCanLogin(user.getTenantId());
         if (Integer.valueOf(CommonStatus.DISABLED).equals(user.getStatus())) {
@@ -117,7 +117,7 @@ public class AuthService {
         String code = String.valueOf(ThreadLocalRandom.current().nextInt(BusinessConstants.SMS_CODE_RANGE_MIN, BusinessConstants.SMS_CODE_RANGE_MAX));
         stringRedisTemplate.opsForValue().set(RedisKeys.storeSmsCode(request.mobile()), code, SMS_CODE_TTL);
         System.out.println("SMS Code: " + code);
-        return new SmsCodeResponse(request.mobile(), (int) SMS_CODE_TTL.toSeconds(), code);
+        return new SmsCodeVO(request.mobile(), (int) SMS_CODE_TTL.toSeconds(), code);
     }
 
     /**
@@ -126,7 +126,7 @@ public class AuthService {
      * @param accountType 账号类型
      * @return 登录响应
      */
-    public LoginResponse login(LoginRequest request, AccountType accountType) {
+    public LoginVO login(LoginDTO request, AccountType accountType) {
         SysUser user = accountType == AccountType.STORE ? storeLogin(request) : platformLogin(request, accountType);
         if (accountType == AccountType.STORE) {
             ensureTenantCanLogin(user.getTenantId());
@@ -144,12 +144,12 @@ public class AuthService {
      * 获取当前登录用户
      * @return 当前登录用户
      */
-    public AccountProfileResponse me() {
-        return AccountProfileResponse.from(currentUser());
+    public AccountProfileVO me() {
+        return AccountProfileVO.from(currentUser());
     }
 
     @Transactional
-    public AccountProfileResponse updateMe(AccountProfileUpdateRequest request) {
+    public AccountProfileVO updateMe(AccountProfileUpdateDTO request) {
         SysUser user = currentUser();
         user.setNickname(request.nickname().trim());
         if (hasText(request.password())) {
@@ -157,7 +157,7 @@ public class AuthService {
         }
         user.setUpdatedAt(LocalDateTime.now());
         sysUserMapper.updateById(user);
-        return AccountProfileResponse.from(user);
+        return AccountProfileVO.from(user);
     }
 
     /**
@@ -165,7 +165,7 @@ public class AuthService {
      * @param request 登录请求
      * @return 登录响应
      */
-    private SysUser storeLogin(LoginRequest request) {
+    private SysUser storeLogin(LoginDTO request) {
         if (!hasText(request.mobile())) {
             throw new BusinessException("请输入手机号");
         }
@@ -207,7 +207,7 @@ public class AuthService {
      * @param accountType 账号类型
      * @return 登录响应
      */
-    private SysUser platformLogin(LoginRequest request, AccountType accountType) {
+    private SysUser platformLogin(LoginDTO request, AccountType accountType) {
         if (!hasText(request.username()) || !hasText(request.password())) {
             throw new BusinessException("请输入用户名和密码");
         }
@@ -324,11 +324,11 @@ public class AuthService {
      * @param permissions 权限列表
      * @return 登录响应
      */
-    private LoginResponse doLogin(SysUser user, List<String> permissions) {
+    private LoginVO doLogin(SysUser user, List<String> permissions) {
         StpUtil.login(user.getId());
         LoginUser loginUser = new LoginUser(user.getId(), user.getTenantId(), AccountType.valueOf(user.getAccountType()), user.getUsername(), user.getStaffRole(), permissions);
         StpUtil.getSession().set("loginUser", loginUser);
         SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
-        return new LoginResponse(tokenInfo.getTokenName(), tokenInfo.getTokenValue(), user.getTenantId(), user.getUsername(), permissions);
+        return new LoginVO(tokenInfo.getTokenName(), tokenInfo.getTokenValue(), user.getTenantId(), user.getUsername(), permissions);
     }
 }

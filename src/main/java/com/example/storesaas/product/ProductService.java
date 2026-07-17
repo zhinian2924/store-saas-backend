@@ -6,12 +6,14 @@ import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.media.MinioStorageService;
-import com.example.storesaas.product.dto.CategoryRequest;
-import com.example.storesaas.product.dto.ProductRequest;
+import com.example.storesaas.product.dto.CategoryDTO;
+import com.example.storesaas.product.dto.ProductDTO;
 import com.example.storesaas.product.entity.Product;
 import com.example.storesaas.product.entity.ProductCategory;
 import com.example.storesaas.product.mapper.ProductCategoryMapper;
 import com.example.storesaas.product.mapper.ProductMapper;
+import com.example.storesaas.product.vo.CategoryVO;
+import com.example.storesaas.product.vo.ProductVO;
 import com.example.storesaas.security.AuthContext;
 import org.springframework.stereotype.Service;
 
@@ -34,12 +36,12 @@ public class ProductService {
      * 获取商品分类列表
      * @return 商品分类列表
      */
-    public List<ProductCategory> categories() {
+    public List<CategoryVO> categories() {
         Long tenantId = AuthContext.tenantId();
         return categoryMapper.selectList(new LambdaQueryWrapper<ProductCategory>()
                 .eq(ProductCategory::getTenantId, tenantId)
                 .eq(ProductCategory::getDeleted, DeleteStatus.NOT_DELETED)
-                .orderByAsc(ProductCategory::getSortNo));
+                .orderByAsc(ProductCategory::getSortNo)).stream().map(CategoryVO::from).toList();
     }
 
     /**
@@ -47,7 +49,7 @@ public class ProductService {
      * @param request 分类请求
      * @return 商品分类
      */
-    public ProductCategory createCategory(CategoryRequest request) {
+    public CategoryVO createCategory(CategoryDTO request) {
         ProductCategory category = new ProductCategory();
         category.setTenantId(AuthContext.tenantId());
         category.setName(request.name());
@@ -55,22 +57,22 @@ public class ProductService {
         category.setStatus(request.status() == null ? CommonStatus.ENABLED : request.status());
         fillCreate(category);
         categoryMapper.insert(category);
-        return category;
+        return CategoryVO.from(category);
     }
 
     /**
      * 获取商品列表
      * @return 商品列表
      */
-    public List<Product> products() {
+    public List<ProductVO> products() {
         Long tenantId = AuthContext.tenantId();
         return productMapper.selectList(new LambdaQueryWrapper<Product>()
                 .eq(Product::getTenantId, tenantId)
                 .eq(Product::getDeleted, DeleteStatus.NOT_DELETED)
-                .orderByDesc(Product::getId));
+                .orderByDesc(Product::getId)).stream().map(ProductVO::from).toList();
     }
 
-    public Product createProduct(ProductRequest request) {
+    public ProductVO createProduct(ProductDTO request) {
         Product product = new Product();
         product.setTenantId(AuthContext.tenantId());
         product.setCategoryId(request.categoryId());
@@ -81,10 +83,10 @@ public class ProductService {
         product.setStatus(normalizeProductStatus(request.status(), product.getStock()));
         fillCreate(product);
         productMapper.insert(product);
-        return product;
+        return ProductVO.from(product);
     }
 
-    public Product updateProduct(Long id, ProductRequest request) {
+    public ProductVO updateProduct(Long id, ProductDTO request) {
         Product product = tenantProduct(AuthContext.tenantId(), id);
         String oldImageUrl = product.getImageUrl();
         product.setCategoryId(request.categoryId());
@@ -97,18 +99,18 @@ public class ProductService {
         if (!java.util.Objects.equals(oldImageUrl, request.imageUrl())) {
             storageService.deleteUrl(oldImageUrl);
         }
-        return product;
+        return ProductVO.from(product);
     }
 
-    public Product setProductStatus(Long id, Integer status) {
+    public ProductVO setProductStatus(Long id, Integer status) {
         Product product = tenantProduct(AuthContext.tenantId(), id);
         product.setStatus(normalizeProductStatus(status, product.getStock()));
         product.setUpdatedAt(LocalDateTime.now());
         productMapper.updateById(product);
-        return product;
+        return ProductVO.from(product);
     }
 
-    public ProductCategory setCategoryStatus(Long id, Integer status) {
+    public CategoryVO setCategoryStatus(Long id, Integer status) {
         Long tenantId = AuthContext.tenantId();
         ProductCategory category = categoryMapper.selectOne(new LambdaQueryWrapper<ProductCategory>()
                 .eq(ProductCategory::getTenantId, tenantId)
@@ -124,7 +126,7 @@ public class ProductService {
         if (nextStatus == CommonStatus.DISABLED) {
             productMapper.stopByCategory(tenantId, id);
         }
-        return category;
+        return CategoryVO.from(category);
     }
 
     public void deleteProduct(Long id) {

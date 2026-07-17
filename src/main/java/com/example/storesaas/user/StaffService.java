@@ -6,9 +6,9 @@ import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.AuthContext;
-import com.example.storesaas.user.dto.StaffCreateRequest;
-import com.example.storesaas.user.dto.StaffResponse;
-import com.example.storesaas.user.dto.StaffUpdateRequest;
+import com.example.storesaas.user.dto.StaffCreateDTO;
+import com.example.storesaas.user.vo.StaffVO;
+import com.example.storesaas.user.dto.StaffUpdateDTO;
 import com.example.storesaas.user.entity.SysUser;
 import com.example.storesaas.user.mapper.SysUserMapper;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class StaffService {
         this.sysUserMapper = sysUserMapper;
     }
 
-    public List<StaffResponse> list() {
+    public List<StaffVO> list() {
         return sysUserMapper.selectList(new LambdaQueryWrapper<SysUser>()
                         .eq(SysUser::getTenantId, AuthContext.tenantId())
                         .eq(SysUser::getAccountType, AccountType.STORE.name())
@@ -34,12 +34,12 @@ public class StaffService {
                         .eq(SysUser::getDeleted, DeleteStatus.NOT_DELETED)
                         .orderByDesc(SysUser::getCreatedAt))
                 .stream()
-                .map(StaffResponse::from)
+                .map(StaffVO::from)
                 .toList();
     }
 
     @Transactional
-    public StaffResponse create(StaffCreateRequest request) {
+    public StaffVO create(StaffCreateDTO request) {
         ensureOwner();
         Long count = sysUserMapper.selectCount(new LambdaQueryWrapper<SysUser>()
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
@@ -65,11 +65,11 @@ public class StaffService {
         user.setUpdatedAt(now);
         user.setDeleted(DeleteStatus.NOT_DELETED);
         sysUserMapper.insert(user);
-        return StaffResponse.from(user);
+        return StaffVO.from(user);
     }
 
     @Transactional
-    public StaffResponse update(Long id, StaffUpdateRequest request) {
+    public StaffVO update(Long id, StaffUpdateDTO request) {
         ensureOwner();
         SysUser user = staff(id);
         StaffRole role = staffRole(request.staffRole());
@@ -86,17 +86,17 @@ public class StaffService {
         }
         user.setUpdatedAt(LocalDateTime.now());
         sysUserMapper.updateById(user);
-        return StaffResponse.from(user);
+        return StaffVO.from(user);
     }
 
     @Transactional
-    public StaffResponse setStatus(Long id, Integer status) {
+    public StaffVO setStatus(Long id, Integer status) {
         ensureOwner();
         SysUser user = staff(id);
         user.setStatus(Integer.valueOf(CommonStatus.DISABLED).equals(status) ? CommonStatus.DISABLED : CommonStatus.ENABLED);
         user.setUpdatedAt(LocalDateTime.now());
         sysUserMapper.updateById(user);
-        return StaffResponse.from(user);
+        return StaffVO.from(user);
     }
 
     private SysUser staff(Long id) {

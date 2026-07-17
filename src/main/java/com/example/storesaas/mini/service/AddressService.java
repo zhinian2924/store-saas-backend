@@ -4,9 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.mini.CustomerContext;
-import com.example.storesaas.mini.dto.AddressRequest;
+import com.example.storesaas.mini.dto.AddressDTO;
 import com.example.storesaas.mini.entity.CustomerAddress;
 import com.example.storesaas.mini.mapper.CustomerAddressMapper;
+import com.example.storesaas.mini.vo.AddressVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,13 @@ public class AddressService {
         this.mapper = mapper;
     }
 
-    public List<CustomerAddress> list() {
-        return mapper.selectList(query().orderByDesc(CustomerAddress::getIsDefault).orderByDesc(CustomerAddress::getId));
+    public List<AddressVO> list() {
+        return mapper.selectList(query().orderByDesc(CustomerAddress::getIsDefault).orderByDesc(CustomerAddress::getId))
+                .stream().map(AddressVO::from).toList();
     }
 
     @Transactional
-    public CustomerAddress create(AddressRequest r) {
+    public AddressVO create(AddressDTO r) {
         CustomerAddress a = new CustomerAddress();
         copy(a, r);
         a.setTenantId(CustomerContext.tenantId());
@@ -34,17 +36,17 @@ public class AddressService {
         fill(a);
         if (Boolean.TRUE.equals(r.isDefault()) || list().isEmpty()) makeDefault(a);
         mapper.insert(a);
-        return a;
+        return AddressVO.from(a);
     }
 
     @Transactional
-    public CustomerAddress update(Long id, AddressRequest r) {
+    public AddressVO update(Long id, AddressDTO r) {
         CustomerAddress a = owned(id);
         copy(a, r);
         a.setUpdatedAt(LocalDateTime.now());
         if (Boolean.TRUE.equals(r.isDefault())) makeDefault(a);
         mapper.updateById(a);
-        return a;
+        return AddressVO.from(a);
     }
 
     @Transactional
@@ -56,11 +58,11 @@ public class AddressService {
     }
 
     @Transactional
-    public CustomerAddress setDefault(Long id) {
+    public AddressVO setDefault(Long id) {
         CustomerAddress a = owned(id);
         makeDefault(a);
         mapper.updateById(a);
-        return a;
+        return AddressVO.from(a);
     }
 
     private CustomerAddress owned(Long id) {
@@ -73,7 +75,7 @@ public class AddressService {
         return new LambdaQueryWrapper<CustomerAddress>().eq(CustomerAddress::getTenantId, CustomerContext.tenantId()).eq(CustomerAddress::getCustomerId, CustomerContext.customerId()).eq(CustomerAddress::getDeleted, DeleteStatus.NOT_DELETED);
     }
 
-    private void copy(CustomerAddress a, AddressRequest r) {
+    private void copy(CustomerAddress a, AddressDTO r) {
         a.setConsignee(r.consignee());
         a.setPhone(r.phone());
         a.setProvince(r.province());

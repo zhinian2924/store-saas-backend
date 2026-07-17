@@ -1,15 +1,15 @@
 package com.example.storesaas.mini;
 
 import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.mini.dto.MiniOrderRequest;
-import com.example.storesaas.mini.entity.CustomerAddress;
+import com.example.storesaas.mini.dto.MiniOrderDTO;
 import com.example.storesaas.mini.service.MiniOrderService;
-import com.example.storesaas.order.entity.StoreOrder;
+import com.example.storesaas.mini.vo.MiniOrderDetailVO;
+import com.example.storesaas.mini.vo.MiniOrderVO;
+import com.example.storesaas.mini.vo.OrderPreviewVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/mini/orders")
@@ -21,31 +21,31 @@ public class MiniOrderController {
     }
 
     @PostMapping("/preview")
-    public ApiResponse<Map<String, Object>> preview(@Valid @RequestBody MiniOrderRequest r) {
+    public ApiResponse<OrderPreviewVO> preview(@Valid @RequestBody MiniOrderDTO r) {
         CustomerContext.current();
         return ApiResponse.ok(service.preview(r));
     }
 
     @PostMapping
-    public ApiResponse<StoreOrder> create(@Valid @RequestBody MiniOrderRequest r) {
+    public ApiResponse<MiniOrderVO> create(@Valid @RequestBody MiniOrderDTO r) {
         CustomerContext.current();
         return ApiResponse.ok(service.create(r));
     }
 
     @GetMapping
-    public ApiResponse<List<StoreOrder>> list() {
+    public ApiResponse<List<MiniOrderVO>> list() {
         CustomerContext.current();
         return ApiResponse.ok(service.list());
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Map<String, Object>> detail(@PathVariable Long id) {
+    public ApiResponse<MiniOrderDetailVO> detail(@PathVariable Long id) {
         CustomerContext.current();
         return ApiResponse.ok(service.detail(id));
     }
 
     @PostMapping("/{id}/cancel")
-    public ApiResponse<StoreOrder> cancel(@PathVariable Long id) {
+    public ApiResponse<MiniOrderVO> cancel(@PathVariable Long id) {
         CustomerContext.current();
         return ApiResponse.ok(service.cancel(id));
     }

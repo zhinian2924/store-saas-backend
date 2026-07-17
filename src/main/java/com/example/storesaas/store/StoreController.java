@@ -3,8 +3,8 @@ package com.example.storesaas.store;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;
-import com.example.storesaas.store.dto.StoreProfileRequest;
-import com.example.storesaas.store.entity.Store;
+import com.example.storesaas.store.dto.StoreProfileDTO;
+import com.example.storesaas.store.vo.StoreVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,13 +23,13 @@ public class StoreController {
 
     @SaCheckPermission(Permissions.STORE_VIEW)
     @GetMapping
-    public ApiResponse<Store> profile() {
+    public ApiResponse<StoreVO> profile() {
         return ApiResponse.ok(storeService.profile());
     }
 
     @SaCheckPermission(Permissions.STORE_UPDATE)
     @PutMapping
-    public ApiResponse<Store> updateProfile(@Valid @RequestBody StoreProfileRequest request) {
+    public ApiResponse<StoreVO> updateProfile(@Valid @RequestBody StoreProfileDTO request) {
         return ApiResponse.ok(storeService.updateProfile(request));
     }
 }

@@ -9,11 +9,12 @@ import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.ResultCode;
 import com.example.storesaas.customer.entity.Customer;
 import com.example.storesaas.customer.mapper.CustomerMapper;
-import com.example.storesaas.mini.dto.WechatLoginRequest;
+import com.example.storesaas.mini.dto.WechatLoginDTO;
+import com.example.storesaas.mini.vo.MiniLoginVO;
 import com.example.storesaas.miniappconfig.MiniappConfigService;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.LoginUser;
-import com.example.storesaas.mini.dto.MockLoginRequest;
+import com.example.storesaas.mini.dto.MockLoginDTO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
 
 @Service
 public class MiniAuthService {
@@ -40,7 +39,7 @@ public class MiniAuthService {
     }
 
     @Transactional
-    public Map<String, Object> wechatLogin(WechatLoginRequest request) {
+    public MiniLoginVO wechatLogin(WechatLoginDTO request) {
         var miniapp = configService.requireActiveByAppId(request.appId());
         var wechatSession = wechatClient.exchange(miniapp.appId(), miniapp.appSecret(), request.code());
         Customer customer = findOrCreate(miniapp.tenantId(), wechatSession.openid());
@@ -48,7 +47,7 @@ public class MiniAuthService {
     }
 
     @Transactional
-    public Map<String, Object> mockLogin(MockLoginRequest request) {
+    public MiniLoginVO mockLogin(MockLoginDTO request) {
         Tenant tenant = tenantMapper.selectOne(new LambdaQueryWrapper<Tenant>()
                 .eq(Tenant::getId, request.tenantId()).eq(Tenant::getDeleted, 0));
         if (tenant == null || !Integer.valueOf(com.example.storesaas.tenant.TenantStatus.ACTIVE).equals(tenant.getStatus())) {
@@ -75,19 +74,13 @@ public class MiniAuthService {
         return customer;
     }
 
-    private Map<String, Object> createSession(Customer c) {
+    private MiniLoginVO createSession(Customer c) {
         StpUtil.login("CUSTOMER:" + c.getId());
         StpUtil.getSession().set("loginUser", new LoginUser(c.getId(), c.getTenantId(), AccountType.CUSTOMER,
                 c.getOpenid(), null, List.of()));
         SaTokenInfo t = StpUtil.getTokenInfo();
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("tokenName", t.getTokenName());
-        response.put("tokenValue", t.getTokenValue());
-        response.put("customerId", c.getId());
-        response.put("tenantId", c.getTenantId());
-        response.put("nickname", c.getNickname());
-        response.put("avatarUrl", c.getAvatarUrl());
-        return response;
+        return new MiniLoginVO(t.getTokenName(), t.getTokenValue(), c.getId(), c.getTenantId(),
+                c.getNickname(), c.getAvatarUrl());
     }
 
     private void fill(Customer c) {

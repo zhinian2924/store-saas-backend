@@ -5,9 +5,10 @@ import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.media.MinioStorageService;
 import com.example.storesaas.security.AuthContext;
-import com.example.storesaas.store.dto.StoreProfileRequest;
+import com.example.storesaas.store.dto.StoreProfileDTO;
 import com.example.storesaas.store.entity.Store;
 import com.example.storesaas.store.mapper.StoreMapper;
+import com.example.storesaas.store.vo.StoreVO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,12 @@ public class StoreService {
         this.storageService = storageService;
     }
 
-    public Store profile() {
-        return currentStore();
+    public StoreVO profile() {
+        return StoreVO.from(currentStore());
     }
 
     @Transactional
-    public Store updateProfile(StoreProfileRequest request) {
+    public StoreVO updateProfile(StoreProfileDTO request) {
         Store store = currentStore();
         LocalDateTime now = LocalDateTime.now();
         store.setName(request.name());
@@ -53,7 +54,7 @@ public class StoreService {
         if (!java.util.Objects.equals(oldLogoUrl, request.logoUrl())) {
             storageService.deleteUrl(oldLogoUrl);
         }
-        return store;
+        return StoreVO.from(store);
     }
 
     private Store currentStore() {

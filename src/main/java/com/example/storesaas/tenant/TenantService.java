@@ -7,9 +7,10 @@ import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.store.entity.Store;
 import com.example.storesaas.store.mapper.StoreMapper;
-import com.example.storesaas.tenant.dto.TenantUpdateRequest;
+import com.example.storesaas.tenant.dto.TenantUpdateDTO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
+import com.example.storesaas.tenant.vo.TenantVO;
 import com.example.storesaas.user.entity.SysUser;
 import com.example.storesaas.user.mapper.SysUserMapper;
 import org.springframework.stereotype.Service;
@@ -30,18 +31,18 @@ public class TenantService {
         this.sysUserMapper = sysUserMapper;
     }
 
-    public List<Tenant> list(Integer status) {
+    public List<TenantVO> list(Integer status) {
         LambdaQueryWrapper<Tenant> query = new LambdaQueryWrapper<Tenant>()
                 .eq(Tenant::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByDesc(Tenant::getId);
         if (status != null) {
             query.eq(Tenant::getStatus, status);
         }
-        return tenantMapper.selectList(query);
+        return tenantMapper.selectList(query).stream().map(TenantVO::from).toList();
     }
 
     @Transactional
-    public void update(Long id, TenantUpdateRequest request) {
+    public void update(Long id, TenantUpdateDTO request) {
         Tenant tenant = requireTenant(id);
         String name = request.name().trim();
         tenant.setName(name);

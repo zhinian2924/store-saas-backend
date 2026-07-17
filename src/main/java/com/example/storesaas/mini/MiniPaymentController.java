@@ -2,7 +2,7 @@ package com.example.storesaas.mini;
 
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.mini.service.MiniPaymentService;
-import com.example.storesaas.order.entity.StoreOrder;
+import com.example.storesaas.mini.vo.MiniOrderVO;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +15,7 @@ public class MiniPaymentController {
     }
 
     @PostMapping("/mock/{orderId}")
-    public ApiResponse<StoreOrder> mock(@PathVariable Long orderId) {
+    public ApiResponse<MiniOrderVO> mock(@PathVariable Long orderId) {
         CustomerContext.current();
         return ApiResponse.ok(service.mock(orderId));
     }

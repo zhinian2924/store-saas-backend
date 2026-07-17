@@ -3,15 +3,16 @@ package com.example.storesaas.product;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;
-import com.example.storesaas.product.dto.CategoryRequest;
-import com.example.storesaas.product.dto.ProductRequest;
-import com.example.storesaas.product.entity.Product;
-import com.example.storesaas.product.entity.ProductCategory;
+import com.example.storesaas.product.dto.CategoryDTO;
+import com.example.storesaas.product.dto.CategoryStatusDTO;
+import com.example.storesaas.product.dto.ProductDTO;
+import com.example.storesaas.product.dto.ProductStatusDTO;
+import com.example.storesaas.product.vo.CategoryVO;
+import com.example.storesaas.product.vo.ProductVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/store")
@@ -24,44 +25,44 @@ public class ProductController {
 
     @SaCheckPermission(Permissions.PRODUCT_VIEW)
     @GetMapping("/categories")
-    public ApiResponse<List<ProductCategory>> categories() {
+    public ApiResponse<List<CategoryVO>> categories() {
         return ApiResponse.ok(productService.categories());
     }
 
     @SaCheckPermission(Permissions.PRODUCT_ADD)
     @PostMapping("/categories")
-    public ApiResponse<ProductCategory> createCategory(@Valid @RequestBody CategoryRequest request) {
+    public ApiResponse<CategoryVO> createCategory(@Valid @RequestBody CategoryDTO request) {
         return ApiResponse.ok(productService.createCategory(request));
     }
 
     @SaCheckPermission(Permissions.PRODUCT_VIEW)
     @GetMapping("/products")
-    public ApiResponse<List<Product>> products() {
+    public ApiResponse<List<ProductVO>> products() {
         return ApiResponse.ok(productService.products());
     }
 
     @SaCheckPermission(Permissions.PRODUCT_ADD)
     @PostMapping("/products")
-    public ApiResponse<Product> createProduct(@Valid @RequestBody ProductRequest request) {
+    public ApiResponse<ProductVO> createProduct(@Valid @RequestBody ProductDTO request) {
         return ApiResponse.ok(productService.createProduct(request));
     }
 
     @SaCheckPermission(Permissions.PRODUCT_UPDATE)
     @PutMapping("/products/{id}")
-    public ApiResponse<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductRequest request) {
+    public ApiResponse<ProductVO> updateProduct(@PathVariable Long id, @Valid @RequestBody ProductDTO request) {
         return ApiResponse.ok(productService.updateProduct(id, request));
     }
 
     @SaCheckPermission(Permissions.PRODUCT_UPDATE)
     @PutMapping("/products/{id}/status")
-    public ApiResponse<Product> updateProductStatus(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
-        return ApiResponse.ok(productService.setProductStatus(id, request.get("status")));
+    public ApiResponse<ProductVO> updateProductStatus(@PathVariable Long id, @Valid @RequestBody ProductStatusDTO request) {
+        return ApiResponse.ok(productService.setProductStatus(id, request.status()));
     }
 
     @SaCheckPermission(Permissions.PRODUCT_UPDATE)
     @PutMapping("/categories/{id}/status")
-    public ApiResponse<ProductCategory> updateCategoryStatus(@PathVariable Long id, @RequestBody Map<String, Integer> request) {
-        return ApiResponse.ok(productService.setCategoryStatus(id, request.get("status")));
+    public ApiResponse<CategoryVO> updateCategoryStatus(@PathVariable Long id, @Valid @RequestBody CategoryStatusDTO request) {
+        return ApiResponse.ok(productService.setCategoryStatus(id, request.status()));
     }
 
     @SaCheckPermission(Permissions.PRODUCT_UPDATE)
