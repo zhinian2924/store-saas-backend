@@ -38,11 +38,12 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-# MinIO 配置
-storage:
-  minio:
-    enabled: ${MINIO_ENABLED}
-    endpoint: ${MINIO_ENDPOINT}
-    access-key: ${MINIO_ACCESS_KEY}
-    secret-key: ${MINIO_SECRET_KEY}
-    bucket: ${MINIO_BUCKET}
+# Apollo 配置中心引导配置
+apollo:
+  meta: ${APOLLO_META:http://192.168.85.202:8080}
+  cacheDir: ${APOLLO_CACHE_DIR:./.apollo-cache}
+  bootstrap:
+    enabled: ${APOLLO_BOOTSTRAP_ENABLED:true}
+    namespaces: application
+    eagerLoad:
+      enabled: true

@@ -76,3 +76,5 @@ src/test/
 
 # SQL
 sql/migration/
+
+.apollo-cache/
