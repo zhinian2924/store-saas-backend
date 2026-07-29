@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.storesaas.analytics.mapper.AnalyticsMapper">
+
+    <select id="selectMetricAmounts"
+            resultType="com.example.storesaas.analytics.mapper.SalesAggregateRows$MetricAmounts">
+        select
+        coalesce(sum(case when o.updated_at >= #{ranges.today.currentStart}
+            and o.updated_at &lt; #{ranges.today.currentEnd} then o.total_amount else 0 end), 0) as todayCurrent,
+        coalesce(sum(case when o.updated_at >= #{ranges.today.previousStart}
+            and o.updated_at &lt; #{ranges.today.previousEnd} then o.total_amount else 0 end), 0) as todayPrevious,
+        coalesce(sum(case when o.updated_at >= #{ranges.today.yearAgoStart}
+            and o.updated_at &lt; #{ranges.today.yearAgoEnd} then o.total_amount else 0 end), 0) as todayYearAgo,
+        sum(case when o.updated_at >= #{ranges.today.yearAgoStart}
+            and o.updated_at &lt; #{ranges.today.yearAgoEnd} then 1 else 0 end) as todayYearAgoCount,
+        coalesce(sum(case when o.updated_at >= #{ranges.week.currentStart}
+            and o.updated_at &lt; #{ranges.week.currentEnd} then o.total_amount else 0 end), 0) as weekCurrent,
+        coalesce(sum(case when o.updated_at >= #{ranges.week.previousStart}
+            and o.updated_at &lt; #{ranges.week.previousEnd} then o.total_amount else 0 end), 0) as weekPrevious,
+        coalesce(sum(case when o.updated_at >= #{ranges.week.yearAgoStart}
+            and o.updated_at &lt; #{ranges.week.yearAgoEnd} then o.total_amount else 0 end), 0) as weekYearAgo,
+        sum(case when o.updated_at >= #{ranges.week.yearAgoStart}
+            and o.updated_at &lt; #{ranges.week.yearAgoEnd} then 1 else 0 end) as weekYearAgoCount,
+        coalesce(sum(case when o.updated_at >= #{ranges.month.currentStart}
+            and o.updated_at &lt; #{ranges.month.currentEnd} then o.total_amount else 0 end), 0) as monthCurrent,
+        coalesce(sum(case when o.updated_at >= #{ranges.month.previousStart}
+            and o.updated_at &lt; #{ranges.month.previousEnd} then o.total_amount else 0 end), 0) as monthPrevious,
+        coalesce(sum(case when o.updated_at >= #{ranges.month.yearAgoStart}
+            and o.updated_at &lt; #{ranges.month.yearAgoEnd} then o.total_amount else 0 end), 0) as monthYearAgo,
+        sum(case when o.updated_at >= #{ranges.month.yearAgoStart}
+            and o.updated_at &lt; #{ranges.month.yearAgoEnd} then 1 else 0 end) as monthYearAgoCount
+        from biz_order o
+        where o.tenant_id = #{tenantId}
+          and o.status = 'PAID'
+          and o.deleted = 0
+          and o.updated_at >= #{ranges.queryStart}
+          and o.updated_at &lt; #{ranges.queryEnd}
+    </select>
+
+    <select id="selectTrend"
+            resultType="com.example.storesaas.analytics.mapper.SalesAggregateRows$AmountBucket">
+        select
+        <choose>
+            <when test="period.name() == 'DAY'">
+                date_format(o.updated_at, '%Y-%m-%d %H:00') as bucketKey,
+            </when>
+            <otherwise>
+                date_format(o.updated_at, '%Y-%m-%d') as bucketKey,
+            </otherwise>
+        </choose>
+        sum(o.total_amount) as amount
+        from biz_order o
+        where o.tenant_id = #{tenantId}
+          and o.status = 'PAID'
+          and o.deleted = 0
+          and o.updated_at >= #{start}
+          and o.updated_at &lt; #{end}
+        group by bucketKey
+        order by bucketKey
+    </select>
+
+    <select id="selectContributions"
+            resultType="com.example.storesaas.analytics.mapper.SalesAggregateRows$ProductContributionRow">
+        select i.product_id as productId,
+               max(i.product_name) as productName,
+               sum(i.amount) as amount
+        from biz_order o
+        inner join biz_order_item i
+                on i.order_id = o.id
+               and i.tenant_id = #{tenantId}
+               and i.deleted = 0
+        where o.tenant_id = #{tenantId}
+          and o.status = 'PAID'
+          and o.deleted = 0
+          and o.updated_at >= #{start}
+          and o.updated_at &lt; #{end}
+        group by i.product_id
+        order by amount desc, i.product_id
+        limit #{limit}
+    </select>
+</mapper>

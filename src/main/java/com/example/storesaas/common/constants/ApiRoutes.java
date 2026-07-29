@@ -8,6 +8,7 @@ public final class ApiRoutes {
     public static final String INVENTORY = "/api/store/inventory";
     public static final String ORDERS = "/api/store/orders";
     public static final String PAYMENTS = "/api/store/payments";
+    public static final String STORE_ANALYTICS = "/api/store/analytics";
     public static final String PLATFORM_TENANTS = "/api/platform/tenants";
 
     private ApiRoutes() {
