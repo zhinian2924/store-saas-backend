@@ -65,7 +65,8 @@
             resultType="com.example.storesaas.analytics.mapper.SalesAggregateRows$ProductContributionRow">
         select i.product_id as productId,
                max(i.product_name) as productName,
-               sum(i.amount) as amount
+               sum(i.amount) as amount,
+               sum(sum(i.amount)) over () as totalAmount
         from biz_order o
         inner join biz_order_item i
                 on i.order_id = o.id

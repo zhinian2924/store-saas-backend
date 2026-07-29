@@ -179,10 +179,7 @@ public class SalesAnalyticsService {
         if (rows == null || rows.isEmpty()) {
             return List.of();
         }
-        BigDecimal total = rows.stream()
-                .map(ProductContributionRow::amount)
-                .filter(Objects::nonNull)
-                .reduce(ZERO, BigDecimal::add);
+        BigDecimal total = value(rows.get(0).totalAmount());
         if (total.compareTo(ZERO) == 0) {
             return List.of();
         }

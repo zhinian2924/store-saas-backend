@@ -56,6 +56,7 @@ public final class SalesAggregateRows {
     public record ProductContributionRow(
             Long productId,
             String productName,
-            BigDecimal amount) {
+            BigDecimal amount,
+            BigDecimal totalAmount) {
     }
 }

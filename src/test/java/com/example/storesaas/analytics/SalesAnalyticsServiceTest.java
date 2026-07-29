@@ -40,8 +40,8 @@ class SalesAnalyticsServiceTest {
                         List.of(new AmountBucket("2026-07-28 00:00", decimal("8"))),
                         List.of());
         when(mapper.selectContributions(eq(42L), any(), any(), eq(8))).thenReturn(List.of(
-                new ProductContributionRow(1L, "招牌咖啡", decimal("60")),
-                new ProductContributionRow(2L, "拿铁", decimal("40"))));
+                new ProductContributionRow(1L, "招牌咖啡", decimal("60"), decimal("200")),
+                new ProductContributionRow(2L, "拿铁", decimal("40"), decimal("200"))));
 
         SalesOverviewVO result;
         try (MockedStatic<AuthContext> auth = mockStatic(AuthContext.class)) {
@@ -61,8 +61,8 @@ class SalesAnalyticsServiceTest {
         assertEquals(decimal("8"), result.trend().get(0).previous());
         assertNull(result.trend().get(0).yearAgo());
         assertEquals(ZERO, result.trend().get(1).current());
-        assertEquals(decimal("0.6000"), result.contributions().get(0).shareRate());
-        assertEquals(decimal("0.4000"), result.contributions().get(1).shareRate());
+        assertEquals(decimal("0.3000"), result.contributions().get(0).shareRate());
+        assertEquals(decimal("0.2000"), result.contributions().get(1).shareRate());
 
         ArgumentCaptor<MetricRanges> ranges = ArgumentCaptor.forClass(MetricRanges.class);
         verify(mapper).selectMetricAmounts(eq(42L), ranges.capture());
@@ -82,7 +82,7 @@ class SalesAnalyticsServiceTest {
                 ZERO, ZERO, ZERO, 0L));
         when(mapper.selectTrend(anyLong(), any(), any(), any())).thenReturn(List.of());
         when(mapper.selectContributions(anyLong(), any(), any(), anyInt())).thenReturn(List.of(
-                new ProductContributionRow(1L, "零元商品", ZERO)));
+                new ProductContributionRow(1L, "零元商品", ZERO, ZERO)));
 
         SalesOverviewVO result;
         try (MockedStatic<AuthContext> auth = mockStatic(AuthContext.class)) {
