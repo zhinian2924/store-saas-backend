@@ -31,7 +31,7 @@ public final class SalesTimeWindowFactory {
         Objects.requireNonNull(period, "period must not be null");
         ZonedDateTime currentStart = periodStart(period, referenceDate);
         ZonedDateTime previousStart = previousBoundary(period, currentStart);
-        ZonedDateTime yearAgoStart = currentStart.minusYears(1);
+        ZonedDateTime yearAgoStart = periodStart(period, referenceDate.minusYears(1));
         Duration elapsed = Duration.between(currentStart, currentEnd);
 
         return new SalesTimeWindow(

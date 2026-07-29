@@ -38,6 +38,8 @@ class SalesTimeWindowFactoryTest {
         assertEquals(now, window.currentEnd());
         assertEquals(at(2024, 2, 26, 0, 0), window.previousStart());
         assertEquals(at(2024, 2, 26, 14, 0), window.previousEnd());
+        assertEquals(at(2023, 2, 27, 0, 0), window.yearAgoStart());
+        assertEquals(at(2023, 2, 27, 14, 0), window.yearAgoEnd());
     }
 
     @Test
