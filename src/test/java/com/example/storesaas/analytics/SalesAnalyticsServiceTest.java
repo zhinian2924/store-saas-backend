@@ -10,6 +10,7 @@ import com.example.storesaas.security.AuthContext;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -26,6 +27,17 @@ class SalesAnalyticsServiceTest {
     private static final Clock CLOCK = Clock.fixed(
             Instant.parse("2026-07-29T02:30:00Z"),
             ZoneId.of("Asia/Shanghai"));
+
+    @Test
+    void springContextUsesProductionConstructor() {
+        try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext()) {
+            context.registerBean(AnalyticsMapper.class, () -> mock(AnalyticsMapper.class));
+            context.register(SalesAnalyticsService.class);
+            context.refresh();
+
+            assertNotNull(context.getBean(SalesAnalyticsService.class));
+        }
+    }
 
     @Test
     void overviewUsesFiveTenantQueriesAndBuildsMoneyFirstContract() {

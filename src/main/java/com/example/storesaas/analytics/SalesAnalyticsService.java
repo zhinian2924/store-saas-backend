@@ -8,6 +8,7 @@ import com.example.storesaas.analytics.mapper.SalesAggregateRows.MetricRanges;
 import com.example.storesaas.analytics.mapper.SalesAggregateRows.ProductContributionRow;
 import com.example.storesaas.analytics.vo.SalesOverviewVO;
 import com.example.storesaas.security.AuthContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -38,6 +39,7 @@ public class SalesAnalyticsService {
     private final Clock clock;
     private final SalesTimeWindowFactory windowFactory = new SalesTimeWindowFactory();
 
+    @Autowired
     public SalesAnalyticsService(AnalyticsMapper mapper) {
         this(mapper, Clock.system(SalesTimeWindowFactory.ZONE));
     }
