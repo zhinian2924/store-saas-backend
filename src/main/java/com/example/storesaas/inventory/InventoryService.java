@@ -56,7 +56,19 @@ public class InventoryService {
         return InventoryFlowVO.from(createFlow(tenantId, product.getId(), request.flowType(), delta, before, after, request.remark()));
     }
 
-    public InventoryFlow createFlow(Long tenantId, Long productId, String flowType, Integer quantity, Integer before, Integer after, String remark) {
+    /**
+     * 创建库存变更记录
+     * @param tenantId
+     * @param productId
+     * @param flowType
+     * @param quantity
+     * @param before
+     * @param after
+     * @param remark
+     * @return
+     */
+    public InventoryFlow createFlow(Long tenantId, Long productId, String flowType, Integer quantity,
+                                    Integer before, Integer after, String remark) {
         InventoryFlow flow = new InventoryFlow();
         flow.setTenantId(tenantId);
         flow.setProductId(productId);
@@ -72,6 +84,11 @@ public class InventoryService {
         return flow;
     }
 
+    /**
+     * 获取库存变更记录
+     *
+     * @return 库存变更记录
+     */
     public List<InventoryFlowVO> flows() {
         Long tenantId = AuthContext.tenantId();
         return flowMapper.selectList(new LambdaQueryWrapper<InventoryFlow>()
