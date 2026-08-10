@@ -17,16 +17,21 @@ import java.time.LocalDateTime;
  * @param beforeStock  变动前库存
  * @param afterStock  变动后库存
  * @param remark      备注
+ * @param productName 商品名称
  */
 public record InventoryFlowVO(
         Long id, LocalDateTime createdAt, LocalDateTime updatedAt, Integer deleted,
         Long tenantId, Long productId, String flowType, Integer quantity,
-        Integer beforeStock, Integer afterStock, String remark) {
+        Integer beforeStock, Integer afterStock, String remark, String productName) {
 
     public static InventoryFlowVO from(InventoryFlow flow) {
+        return from(flow, null);
+    }
+
+    public static InventoryFlowVO from(InventoryFlow flow, String productName) {
         return new InventoryFlowVO(
                 flow.getId(), flow.getCreatedAt(), flow.getUpdatedAt(), flow.getDeleted(),
                 flow.getTenantId(), flow.getProductId(), flow.getFlowType(), flow.getQuantity(),
-                flow.getBeforeStock(), flow.getAfterStock(), flow.getRemark());
+                flow.getBeforeStock(), flow.getAfterStock(), flow.getRemark(), productName);
     }
 }

@@ -1,7 +1,7 @@
 package com.example.storesaas.common.constants;
 
 public final class ResultCode {
-    public static final int SUCCESS = 0;
+    public static final int SUCCESS = 200;
     public static final int BAD_REQUEST = 400;// 请求错误
     public static final int UNAUTHORIZED = 401;// 未授权
     public static final int FORBIDDEN = 403;// 禁止访问

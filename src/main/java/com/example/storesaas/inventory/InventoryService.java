@@ -1,7 +1,9 @@
 package com.example.storesaas.inventory;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.common.PageResult;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.InventoryFlowType;
 import com.example.storesaas.inventory.dto.StockAdjustDTO;
@@ -16,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryService {
@@ -85,15 +89,35 @@ public class InventoryService {
     }
 
     /**
-     * 获取库存变更记录
-     *
-     * @return 库存变更记录
+     * 分页获取库存变更记录
+     * @param page 页码（从 1 开始）
+     * @param size 每页条数
+     * @return 分页库存变更记录
      */
-    public List<InventoryFlowVO> flows() {
+    public PageResult<InventoryFlowVO> flows(int page, int size) {
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.min(Math.max(size, 1), 100);
         Long tenantId = AuthContext.tenantId();
-        return flowMapper.selectList(new LambdaQueryWrapper<InventoryFlow>()
-                .eq(InventoryFlow::getTenantId, tenantId)
-                .eq(InventoryFlow::getDeleted, DeleteStatus.NOT_DELETED)
-                .orderByDesc(InventoryFlow::getId)).stream().map(InventoryFlowVO::from).toList();
+        Page<InventoryFlow> flowPage = flowMapper.selectPage(
+                new Page<>(safePage, safeSize),
+                new LambdaQueryWrapper<InventoryFlow>()
+                        .eq(InventoryFlow::getTenantId, tenantId)
+                        .eq(InventoryFlow::getDeleted, DeleteStatus.NOT_DELETED)
+                        .orderByDesc(InventoryFlow::getId));
+        List<InventoryFlow> records = flowPage.getRecords();
+        Map<Long, String> productNames = loadProductNames(records);
+        List<InventoryFlowVO> vos = records.stream()
+                .map(flow -> InventoryFlowVO.from(flow, productNames.get(flow.getProductId())))
+                .toList();
+        return PageResult.of(flowPage, vos);
+    }
+
+    private Map<Long, String> loadProductNames(List<InventoryFlow> records) {
+        if (records.isEmpty()) {
+            return Map.of();
+        }
+        List<Long> productIds = records.stream().map(InventoryFlow::getProductId).distinct().toList();
+        return productMapper.selectBatchIds(productIds).stream()
+                .collect(Collectors.toMap(Product::getId, Product::getName));
     }
 }
