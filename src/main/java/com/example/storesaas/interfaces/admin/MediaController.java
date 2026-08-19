@@ -1,5 +1,6 @@
-package com.example.storesaas.media;
+package com.example.storesaas.interfaces.admin;
 
+import com.example.storesaas.media.MinioStorageService;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;

@@ -1,5 +1,7 @@
-package com.example.storesaas.auth;
+package com.example.storesaas.interfaces.admin;
 
+import com.example.storesaas.auth.AuthService;
+import com.example.storesaas.auth.AuthService;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.auth.dto.LoginDTO;
 import com.example.storesaas.auth.vo.LoginVO;

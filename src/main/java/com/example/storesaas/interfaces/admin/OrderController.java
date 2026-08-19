@@ -1,5 +1,6 @@
-package com.example.storesaas.order;
+package com.example.storesaas.interfaces.admin;
 
+import com.example.storesaas.order.OrderService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;

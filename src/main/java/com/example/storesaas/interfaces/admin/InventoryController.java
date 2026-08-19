@@ -1,5 +1,7 @@
-package com.example.storesaas.inventory;
+package com.example.storesaas.interfaces.admin;
 
+import com.example.storesaas.inventory.InventoryService;
+import com.example.storesaas.inventory.InventoryService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.PageResult;

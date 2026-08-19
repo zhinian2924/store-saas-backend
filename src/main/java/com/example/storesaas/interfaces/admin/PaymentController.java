@@ -1,5 +1,6 @@
-package com.example.storesaas.payment;
+package com.example.storesaas.interfaces.admin;
 
+import com.example.storesaas.payment.PaymentService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;

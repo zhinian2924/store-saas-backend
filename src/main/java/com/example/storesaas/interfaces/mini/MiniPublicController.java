@@ -1,4 +1,4 @@
-package com.example.storesaas.mini;
+package com.example.storesaas.interfaces.mini;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.ApiResponse;

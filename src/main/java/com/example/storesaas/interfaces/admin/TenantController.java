@@ -1,5 +1,6 @@
-package com.example.storesaas.tenant;
+package com.example.storesaas.interfaces.admin;
 
+import com.example.storesaas.tenant.TenantService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;
