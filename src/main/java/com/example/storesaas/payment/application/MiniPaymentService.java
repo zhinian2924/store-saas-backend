@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.service;
+package com.example.storesaas.payment.application;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.platform.error.BusinessException;
