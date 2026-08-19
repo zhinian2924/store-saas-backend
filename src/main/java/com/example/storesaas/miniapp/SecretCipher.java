@@ -12,6 +12,9 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * 小程序密钥加解密工具类
+ */
 @Component
 public class SecretCipher {
     private static final int IV_BYTES = 12;

@@ -9,6 +9,9 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+/**
+ * 微信客户端
+ */
 @Component
 public class WechatClient {
     private final RestClient restClient;
@@ -42,8 +45,6 @@ public class WechatClient {
                     .retrieve()
                     .body(String.class);
             return parseResponse(responseBody);
-        } catch (BusinessException ex) {
-            throw ex;
         } catch (RestClientException ex) {
             throw serviceUnavailable();
         }
