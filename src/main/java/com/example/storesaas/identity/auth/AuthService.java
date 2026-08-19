@@ -10,13 +10,11 @@ import com.example.storesaas.identity.auth.vo.LoginVO;
 import com.example.storesaas.identity.auth.dto.RegisterTenantDTO;
 import com.example.storesaas.identity.auth.dto.SmsCodeDTO;
 import com.example.storesaas.identity.auth.vo.SmsCodeVO;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.BusinessConstants;
-import com.example.storesaas.common.constants.CommonStatus;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.LoginType;
-import com.example.storesaas.common.constants.Permissions;
-import com.example.storesaas.common.constants.RedisKeys;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.model.EnableStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.identity.auth.infrastructure.RedisKeys;
+import com.example.storesaas.identity.api.Permissions;
 import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.identity.security.AuthContext;
 import com.example.storesaas.identity.security.LoginUser;
@@ -25,6 +23,7 @@ import com.example.storesaas.tenant.store.mapper.StoreMapper;
 import com.example.storesaas.tenant.TenantStatus;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
+import com.example.storesaas.tenant.domain.TenantCodeRules;
 import com.example.storesaas.identity.user.StaffPermissions;
 import com.example.storesaas.identity.user.StaffRole;
 import com.example.storesaas.identity.user.entity.SysUser;
@@ -95,7 +94,7 @@ public class AuthService {
         owner.setAccountType(AccountType.STORE.name());
         owner.setStaffRole(StaffRole.OWNER.name());
         owner.setPermissions(StaffPermissions.join(StaffPermissions.owner()));
-        owner.setStatus(CommonStatus.DISABLED);
+        owner.setStatus(EnableStatus.DISABLED);
         owner.setCreatedAt(now);
         owner.setUpdatedAt(now);
         owner.setDeleted(DeleteStatus.NOT_DELETED);
@@ -111,10 +110,10 @@ public class AuthService {
     public SmsCodeVO sendStoreSmsCode(SmsCodeDTO request) {
         SysUser user = findStoreUserByMobile(request.mobile());
         ensureTenantCanLogin(user.getTenantId());
-        if (Integer.valueOf(CommonStatus.DISABLED).equals(user.getStatus())) {
+        if (Integer.valueOf(EnableStatus.DISABLED).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
-        String code = String.valueOf(ThreadLocalRandom.current().nextInt(BusinessConstants.SMS_CODE_RANGE_MIN, BusinessConstants.SMS_CODE_RANGE_MAX));
+        String code = String.valueOf(ThreadLocalRandom.current().nextInt(AuthRules.SMS_CODE_RANGE_MIN, AuthRules.SMS_CODE_RANGE_MAX));
         stringRedisTemplate.opsForValue().set(RedisKeys.storeSmsCode(request.mobile()), code, SMS_CODE_TTL);
         System.out.println("SMS Code: " + code);
         return new SmsCodeVO(request.mobile(), (int) SMS_CODE_TTL.toSeconds(), code);
@@ -131,7 +130,7 @@ public class AuthService {
         if (accountType == AccountType.STORE) {
             ensureTenantCanLogin(user.getTenantId());
         }
-        if (Integer.valueOf(CommonStatus.DISABLED).equals(user.getStatus())) {
+        if (Integer.valueOf(EnableStatus.DISABLED).equals(user.getStatus())) {
             throw new BusinessException("账号已禁用");
         }
         List<String> permissions = accountType == AccountType.PLATFORM
@@ -273,7 +272,7 @@ public class AuthService {
      * @return 店主用户名
      */
     private String generateStoreOwnerUsername(Long tenantId) {
-        return BusinessConstants.STORE_USERNAME_PREFIX + tenantId;
+        return AuthRules.STORE_USERNAME_PREFIX + tenantId;
     }
 
     /**
@@ -283,8 +282,8 @@ public class AuthService {
      */
     private String generateTenantCode(String storeName) {
         String prefix = normalizeTenantCodePrefix(storeName);
-        for (int i = 0; i < BusinessConstants.TENANT_CODE_RETRY_LIMIT; i++) {
-            String candidate = prefix + "-" + ThreadLocalRandom.current().nextInt(BusinessConstants.SMS_CODE_RANGE_MIN, BusinessConstants.SMS_CODE_RANGE_MAX);
+        for (int i = 0; i < TenantCodeRules.RETRY_LIMIT; i++) {
+            String candidate = prefix + "-" + ThreadLocalRandom.current().nextInt(AuthRules.SMS_CODE_RANGE_MIN, AuthRules.SMS_CODE_RANGE_MAX);
             Long count = tenantMapper.selectCount(new LambdaQueryWrapper<Tenant>().eq(Tenant::getTenantCode, candidate));
             if (count == 0) {
                 return candidate;
@@ -300,17 +299,17 @@ public class AuthService {
      */
     private String normalizeTenantCodePrefix(String storeName) {
         if (!hasText(storeName)) {
-            return BusinessConstants.DEFAULT_TENANT_CODE_PREFIX;
+            return TenantCodeRules.DEFAULT_PREFIX;
         }
         String normalized = storeName.trim()
                 .toLowerCase(Locale.ROOT)
                 .replaceAll("[^a-z0-9]+", "-")
                 .replaceAll("(^-+|-+$)", "");
         if (!hasText(normalized)) {
-            return BusinessConstants.DEFAULT_TENANT_CODE_PREFIX;
+            return TenantCodeRules.DEFAULT_PREFIX;
         }
-        return normalized.length() > BusinessConstants.TENANT_CODE_MAX_PREFIX_LENGTH
-                ? normalized.substring(0, BusinessConstants.TENANT_CODE_MAX_PREFIX_LENGTH).replaceAll("-+$", "")
+        return normalized.length() > TenantCodeRules.MAX_PREFIX_LENGTH
+                ? normalized.substring(0, TenantCodeRules.MAX_PREFIX_LENGTH).replaceAll("-+$", "")
                 : normalized;
     }
 

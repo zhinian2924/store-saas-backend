@@ -2,8 +2,8 @@ package com.example.storesaas.interfaces.admin;
 
 import com.example.storesaas.tenant.store.StoreService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.common.constants.Permissions;
+import com.example.storesaas.platform.web.ApiResponse;
+import com.example.storesaas.identity.api.Permissions;
 import com.example.storesaas.tenant.store.dto.StoreProfileDTO;
 import com.example.storesaas.tenant.store.vo.StoreVO;
 import jakarta.validation.Valid;

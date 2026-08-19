@@ -1,8 +1,8 @@
 package com.example.storesaas.identity.security;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.ResultCode;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.error.ResultCode;
 
 public final class AuthContext {
     private AuthContext() {

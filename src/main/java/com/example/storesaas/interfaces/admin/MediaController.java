@@ -2,8 +2,8 @@ package com.example.storesaas.interfaces.admin;
 
 import com.example.storesaas.media.MinioStorageService;
 import cn.dev33.satoken.stp.StpUtil;
-import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.common.constants.Permissions;
+import com.example.storesaas.platform.web.ApiResponse;
+import com.example.storesaas.identity.api.Permissions;
 import com.example.storesaas.media.vo.UploadVO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

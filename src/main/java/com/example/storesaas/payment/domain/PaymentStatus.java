@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.payment.domain;
 
 /**
  * 支付状态

@@ -1,6 +1,6 @@
 package com.example.storesaas.miniapp;
 
-import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.platform.error.BusinessException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 

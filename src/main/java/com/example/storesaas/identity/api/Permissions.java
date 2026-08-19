@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.identity.api;
 
 public final class Permissions {
     // 门店权限

@@ -3,10 +3,10 @@ package com.example.storesaas.mini.service;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.CommonStatus;
-import com.example.storesaas.common.constants.ResultCode;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.platform.model.EnableStatus;
+import com.example.storesaas.platform.error.ResultCode;
 import com.example.storesaas.customer.entity.Customer;
 import com.example.storesaas.customer.mapper.CustomerMapper;
 import com.example.storesaas.mini.dto.WechatLoginDTO;
@@ -65,10 +65,10 @@ public class MiniAuthService {
             customer = new Customer();
             customer.setTenantId(tenantId);
             customer.setOpenid(openid);
-            customer.setStatus(CommonStatus.ENABLED);
+            customer.setStatus(EnableStatus.ENABLED);
             fill(customer);
             customerMapper.insert(customer);
-        } else if (!Integer.valueOf(CommonStatus.ENABLED).equals(customer.getStatus())) {
+        } else if (!Integer.valueOf(EnableStatus.ENABLED).equals(customer.getStatus())) {
             throw new BusinessException(ResultCode.FORBIDDEN, "消费者账号已停用");
         }
         return customer;

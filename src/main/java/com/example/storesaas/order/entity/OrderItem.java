@@ -1,7 +1,7 @@
 package com.example.storesaas.order.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.example.storesaas.common.BaseEntity;
+import com.example.storesaas.platform.persistence.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

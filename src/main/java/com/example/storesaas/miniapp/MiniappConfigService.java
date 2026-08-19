@@ -1,10 +1,10 @@
 package com.example.storesaas.miniapp;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.CommonStatus;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.ResultCode;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.model.EnableStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.platform.error.ResultCode;
 import com.example.storesaas.miniapp.dto.MiniappConfigDTO;
 import com.example.storesaas.miniapp.vo.MiniappConfigVO;
 import com.example.storesaas.miniapp.entity.MiniappConfig;
@@ -57,7 +57,7 @@ public class MiniappConfigService {
             if (secret.isEmpty()) throw new BusinessException("首次配置必须填写AppSecret");
             config = new MiniappConfig();
             config.setTenantId(tenantId);
-            config.setStatus(CommonStatus.ENABLED);
+            config.setStatus(EnableStatus.ENABLED);
             config.setCreatedBy(operatorId);
             config.setCreatedAt(now);
             config.setDeleted(DeleteStatus.NOT_DELETED);
@@ -73,8 +73,8 @@ public class MiniappConfigService {
     @Transactional
     public MiniappConfigVO setStatus(Long tenantId, Integer status) {
         Long operatorId = requirePlatform();
-        if (!Integer.valueOf(CommonStatus.ENABLED).equals(status)
-                && !Integer.valueOf(CommonStatus.DISABLED).equals(status)) {
+        if (!Integer.valueOf(EnableStatus.ENABLED).equals(status)
+                && !Integer.valueOf(EnableStatus.DISABLED).equals(status)) {
             throw new BusinessException("小程序配置状态不合法");
         }
         MiniappConfig config = findByTenant(tenantId);
@@ -100,7 +100,7 @@ public class MiniappConfigService {
     public void requireActiveTenantAccess(Long tenantId) {
         requireTenant(tenantId, true);
         MiniappConfig config = findByTenant(tenantId);
-        if (config == null || !Integer.valueOf(CommonStatus.ENABLED).equals(config.getStatus())) {
+        if (config == null || !Integer.valueOf(EnableStatus.ENABLED).equals(config.getStatus())) {
             throw new BusinessException(ResultCode.FORBIDDEN, "小程序未配置或已停用");
         }
     }
@@ -109,7 +109,7 @@ public class MiniappConfigService {
         if (appId == null || appId.isBlank()) throw new BusinessException("缺少小程序AppID");
         MiniappConfig config = configMapper.selectOne(new LambdaQueryWrapper<MiniappConfig>()
                 .eq(MiniappConfig::getAppId, appId.trim())
-                .eq(MiniappConfig::getStatus, CommonStatus.ENABLED)
+                .eq(MiniappConfig::getStatus, EnableStatus.ENABLED)
                 .eq(MiniappConfig::getDeleted, DeleteStatus.NOT_DELETED));
         if (config == null) throw new BusinessException(ResultCode.FORBIDDEN, "小程序未配置或已停用");
         requireTenant(config.getTenantId(), true);

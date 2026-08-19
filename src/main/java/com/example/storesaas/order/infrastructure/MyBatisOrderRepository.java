@@ -1,7 +1,7 @@
 package com.example.storesaas.order.infrastructure;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
 import com.example.storesaas.order.domain.OrderRepository;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;

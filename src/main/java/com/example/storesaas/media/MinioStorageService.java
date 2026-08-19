@@ -1,6 +1,6 @@
 package com.example.storesaas.media;
 
-import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.platform.error.BusinessException;
 import com.example.storesaas.identity.security.AuthContext;
 import io.minio.*;
 import jakarta.annotation.PostConstruct;

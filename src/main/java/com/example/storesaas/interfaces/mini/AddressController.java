@@ -1,7 +1,7 @@
 package com.example.storesaas.interfaces.mini;
 
 import com.example.storesaas.mini.CustomerContext;
-import com.example.storesaas.common.ApiResponse;
+import com.example.storesaas.platform.web.ApiResponse;
 import com.example.storesaas.customer.dto.AddressDTO;
 import com.example.storesaas.customer.service.AddressService;
 import com.example.storesaas.customer.vo.AddressVO;

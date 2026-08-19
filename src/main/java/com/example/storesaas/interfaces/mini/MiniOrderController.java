@@ -1,7 +1,7 @@
 package com.example.storesaas.interfaces.mini;
 
 import com.example.storesaas.mini.CustomerContext;
-import com.example.storesaas.common.ApiResponse;
+import com.example.storesaas.platform.web.ApiResponse;
 import com.example.storesaas.mini.dto.MiniOrderDTO;
 import com.example.storesaas.mini.service.MiniOrderService;
 import com.example.storesaas.mini.vo.MiniOrderDetailVO;

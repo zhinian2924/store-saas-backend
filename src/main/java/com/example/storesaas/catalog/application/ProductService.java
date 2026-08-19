@@ -1,10 +1,10 @@
 package com.example.storesaas.catalog.application;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.CommonStatus;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.model.EnableStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.catalog.domain.ProductStatus;
 import com.example.storesaas.catalog.api.ProductReader;
 import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.media.MinioStorageService;
@@ -56,7 +56,7 @@ public class ProductService implements ProductReader {
         category.setTenantId(AuthContext.tenantId());
         category.setName(request.name());
         category.setSortNo(request.sortNo() == null ? 0 : request.sortNo());
-        category.setStatus(request.status() == null ? CommonStatus.ENABLED : request.status());
+        category.setStatus(request.status() == null ? EnableStatus.ENABLED : request.status());
         fillCreate(category);
         categoryMapper.insert(category);
         return CategoryVO.from(category);
@@ -121,11 +121,11 @@ public class ProductService implements ProductReader {
         if (category == null) {
             throw new BusinessException("分类不存在");
         }
-        int nextStatus = Integer.valueOf(CommonStatus.DISABLED).equals(status) ? CommonStatus.DISABLED : CommonStatus.ENABLED;
+        int nextStatus = Integer.valueOf(EnableStatus.DISABLED).equals(status) ? EnableStatus.DISABLED : EnableStatus.ENABLED;
         category.setStatus(nextStatus);
         category.setUpdatedAt(LocalDateTime.now());
         categoryMapper.updateById(category);
-        if (nextStatus == CommonStatus.DISABLED) {
+        if (nextStatus == EnableStatus.DISABLED) {
             productMapper.stopByCategory(tenantId, id);
         }
         return CategoryVO.from(category);

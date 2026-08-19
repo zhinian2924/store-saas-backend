@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.identity.auth;
 
 /**
  * 登录类型

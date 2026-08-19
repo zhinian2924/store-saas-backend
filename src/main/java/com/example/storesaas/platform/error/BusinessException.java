@@ -1,6 +1,5 @@
-package com.example.storesaas.common;
+package com.example.storesaas.platform.error;
 
-import com.example.storesaas.common.constants.ResultCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

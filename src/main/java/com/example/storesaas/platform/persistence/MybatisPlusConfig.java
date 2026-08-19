@@ -1,4 +1,4 @@
-package com.example.storesaas.config;
+package com.example.storesaas.platform.persistence;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.extension.plugins.inner.*;

@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.order.domain;
 
 /**
  * 订单状态

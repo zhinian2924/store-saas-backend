@@ -2,8 +2,8 @@ package com.example.storesaas.order.application;
 
 import com.example.storesaas.catalog.api.ProductReader;
 import com.example.storesaas.catalog.api.ProductSnapshot;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.catalog.domain.ProductStatus;
 import com.example.storesaas.order.entity.OrderItem;
 import org.springframework.stereotype.Service;
 

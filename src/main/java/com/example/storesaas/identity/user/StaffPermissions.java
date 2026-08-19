@@ -1,6 +1,6 @@
 package com.example.storesaas.identity.user;
 
-import com.example.storesaas.common.constants.Permissions;
+import com.example.storesaas.identity.api.Permissions;
 
 import java.util.Arrays;
 import java.util.List;

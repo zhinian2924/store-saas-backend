@@ -1,8 +1,8 @@
 package com.example.storesaas.mini.service;
 
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.OrderStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.order.domain.OrderStatus;
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.mini.dto.MiniOrderDTO;
 import com.example.storesaas.customer.entity.CustomerAddress;

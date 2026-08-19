@@ -1,4 +1,4 @@
-package com.example.storesaas.common;
+package com.example.storesaas.platform.web;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 

@@ -1,6 +1,6 @@
 package com.example.storesaas.interfaces.mini;
 
-import com.example.storesaas.common.ApiResponse;
+import com.example.storesaas.platform.web.ApiResponse;
 import com.example.storesaas.mini.dto.WechatLoginDTO;
 import com.example.storesaas.mini.service.MiniAuthService;
 import com.example.storesaas.mini.vo.MiniCustomerVO;

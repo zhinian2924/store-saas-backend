@@ -2,10 +2,10 @@ package com.example.storesaas.inventory;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.PageResult;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.InventoryFlowType;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.web.PageResult;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.inventory.domain.InventoryFlowType;
 import com.example.storesaas.inventory.dto.StockAdjustDTO;
 import com.example.storesaas.inventory.entity.InventoryFlow;
 import com.example.storesaas.inventory.mapper.InventoryFlowMapper;

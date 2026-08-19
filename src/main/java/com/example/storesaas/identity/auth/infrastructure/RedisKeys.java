@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.identity.auth.infrastructure;
 
 public final class RedisKeys {
     // 存储短信验证码的Redis key前缀

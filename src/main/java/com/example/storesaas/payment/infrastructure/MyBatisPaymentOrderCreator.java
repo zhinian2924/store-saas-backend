@@ -1,8 +1,8 @@
 package com.example.storesaas.payment.infrastructure;
 
-import com.example.storesaas.common.constants.BusinessConstants;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.PaymentStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.payment.domain.PaymentNumberRules;
+import com.example.storesaas.payment.domain.PaymentStatus;
 import com.example.storesaas.payment.api.PaymentOrderCreator;
 import com.example.storesaas.payment.entity.PaymentOrder;
 import com.example.storesaas.payment.mapper.PaymentOrderMapper;
@@ -27,8 +27,8 @@ public class MyBatisPaymentOrderCreator implements PaymentOrderCreator {
         PaymentOrder paymentOrder = new PaymentOrder();
         paymentOrder.setTenantId(tenantId);
         paymentOrder.setOrderId(orderId);
-        paymentOrder.setPayNo(BusinessConstants.PAY_NO_PREFIX + now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
-                + ThreadLocalRandom.current().nextInt(BusinessConstants.ORDER_NO_RANDOM_MIN, BusinessConstants.ORDER_NO_RANDOM_MAX));
+        paymentOrder.setPayNo(PaymentNumberRules.PREFIX + now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
+                + ThreadLocalRandom.current().nextInt(PaymentNumberRules.RANDOM_MIN, PaymentNumberRules.RANDOM_MAX));
         paymentOrder.setChannel(channel);
         paymentOrder.setStatus(PaymentStatus.WAITING);
         paymentOrder.setAmount(amount);

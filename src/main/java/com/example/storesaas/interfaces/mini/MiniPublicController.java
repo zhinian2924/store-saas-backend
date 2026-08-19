@@ -1,9 +1,9 @@
 package com.example.storesaas.interfaces.mini;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.platform.web.ApiResponse;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.catalog.domain.ProductStatus;
 import com.example.storesaas.catalog.entity.Product;
 import com.example.storesaas.catalog.entity.ProductCategory;
 import com.example.storesaas.catalog.mapper.ProductCategoryMapper;

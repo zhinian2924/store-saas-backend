@@ -1,4 +1,4 @@
-package com.example.storesaas.common;
+package com.example.storesaas.platform.web;
 
 public record ApiResponse<T>(int code, String message, T data) {
 

@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.platform.web;
 
 public final class ApiRoutes {
     public static final String AUTH = "/api/auth";

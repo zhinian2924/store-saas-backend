@@ -1,4 +1,4 @@
-package com.example.storesaas.common;
+package com.example.storesaas.platform.persistence;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

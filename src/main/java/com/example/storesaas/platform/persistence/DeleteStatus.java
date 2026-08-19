@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.platform.persistence;
 
 public final class DeleteStatus {
     public static final int NOT_DELETED = 0;// 未删除

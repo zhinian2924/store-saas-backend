@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.inventory.domain;
 
 /**
  * 库存流水类型

@@ -4,7 +4,7 @@ import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
-import com.example.storesaas.common.constants.ApiRoutes;
+import com.example.storesaas.platform.web.ApiRoutes;
 import com.example.storesaas.mini.MiniCustomerGuardInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

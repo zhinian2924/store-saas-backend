@@ -2,8 +2,8 @@ package com.example.storesaas.interfaces.admin;
 
 import com.example.storesaas.catalog.application.ProductService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.common.constants.Permissions;
+import com.example.storesaas.platform.web.ApiResponse;
+import com.example.storesaas.identity.api.Permissions;
 import com.example.storesaas.catalog.dto.CategoryDTO;
 import com.example.storesaas.catalog.dto.CategoryStatusDTO;
 import com.example.storesaas.catalog.dto.ProductDTO;

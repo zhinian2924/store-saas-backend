@@ -1,8 +1,9 @@
-package com.example.storesaas.common;
+package com.example.storesaas.platform.web;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
-import com.example.storesaas.common.constants.ResultCode;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.error.ResultCode;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;

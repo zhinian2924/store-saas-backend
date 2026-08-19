@@ -1,9 +1,9 @@
 package com.example.storesaas.identity.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.CommonStatus;
-import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.model.EnableStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
 import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.identity.security.AuthContext;
 import com.example.storesaas.identity.user.dto.StaffCreateDTO;
@@ -60,7 +60,7 @@ public class StaffService {
         user.setAccountType(AccountType.STORE.name());
         user.setStaffRole(role.name());
         user.setPermissions(StaffPermissions.joinGrantable(request.permissions()));
-        user.setStatus(CommonStatus.ENABLED);
+        user.setStatus(EnableStatus.ENABLED);
         user.setCreatedAt(now);
         user.setUpdatedAt(now);
         user.setDeleted(DeleteStatus.NOT_DELETED);
@@ -82,7 +82,7 @@ public class StaffService {
         user.setStaffRole(role.name());
         user.setPermissions(StaffPermissions.joinGrantable(request.permissions()));
         if (request.status() != null) {
-            user.setStatus(Integer.valueOf(CommonStatus.DISABLED).equals(request.status()) ? CommonStatus.DISABLED : CommonStatus.ENABLED);
+            user.setStatus(Integer.valueOf(EnableStatus.DISABLED).equals(request.status()) ? EnableStatus.DISABLED : EnableStatus.ENABLED);
         }
         user.setUpdatedAt(LocalDateTime.now());
         sysUserMapper.updateById(user);
@@ -93,7 +93,7 @@ public class StaffService {
     public StaffVO setStatus(Long id, Integer status) {
         ensureOwner();
         SysUser user = staff(id);
-        user.setStatus(Integer.valueOf(CommonStatus.DISABLED).equals(status) ? CommonStatus.DISABLED : CommonStatus.ENABLED);
+        user.setStatus(Integer.valueOf(EnableStatus.DISABLED).equals(status) ? EnableStatus.DISABLED : EnableStatus.ENABLED);
         user.setUpdatedAt(LocalDateTime.now());
         sysUserMapper.updateById(user);
         return StaffVO.from(user);

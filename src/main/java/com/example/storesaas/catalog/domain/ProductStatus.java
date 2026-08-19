@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.catalog.domain;
 
 public final class ProductStatus {
     public static final int OFF_SHELF = 0;

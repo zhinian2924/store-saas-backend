@@ -1,8 +1,8 @@
 package com.example.storesaas.order;
 
-import com.example.storesaas.common.constants.BusinessConstants;
-import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.common.constants.OrderStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
+import com.example.storesaas.order.domain.OrderNumberRules;
+import com.example.storesaas.order.domain.OrderStatus;
 import com.example.storesaas.order.application.OrderPricingService;
 import com.example.storesaas.order.dto.CreateOrderDTO;
 import com.example.storesaas.order.domain.OrderRepository;
@@ -11,6 +11,7 @@ import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.vo.OrderItemVO;
 import com.example.storesaas.order.vo.OrderVO;
 import com.example.storesaas.payment.api.PaymentOrderCreator;
+import com.example.storesaas.payment.api.PaymentChannels;
 import com.example.storesaas.identity.security.AuthContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +44,7 @@ public class OrderService {
         StoreOrder order = new StoreOrder();
         order.setTenantId(tenantId);
         order.setCustomerId(AuthContext.currentUser().userId());
-        order.setOrderNo(no(BusinessConstants.ORDER_NO_PREFIX));
+        order.setOrderNo(no(OrderNumberRules.PREFIX));
         order.setStatus(OrderStatus.PENDING_PAY);
         order.setTotalAmount(total);
         fill(order);
@@ -56,7 +57,7 @@ public class OrderService {
             orderRepository.saveItem(item);
         }
 
-        paymentOrderCreator.create(tenantId, order.getId(), total, BusinessConstants.PAY_CHANNEL_MOCK);
+        paymentOrderCreator.create(tenantId, order.getId(), total, PaymentChannels.MOCK);
         return OrderVO.from(order);
     }
 
@@ -72,7 +73,7 @@ public class OrderService {
 
     private String no(String prefix) {
         return prefix + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")) +
-                ThreadLocalRandom.current().nextInt(BusinessConstants.ORDER_NO_RANDOM_MIN, BusinessConstants.ORDER_NO_RANDOM_MAX);
+                ThreadLocalRandom.current().nextInt(OrderNumberRules.RANDOM_MIN, OrderNumberRules.RANDOM_MAX);
     }
 
     private void fill(Object entity) {

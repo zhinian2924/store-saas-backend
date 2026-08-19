@@ -2,9 +2,9 @@ package com.example.storesaas.inventory;
 
 import com.example.storesaas.catalog.api.ProductReader;
 import com.example.storesaas.catalog.api.ProductSnapshot;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.InventoryFlowType;
-import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.inventory.domain.InventoryFlowType;
+import com.example.storesaas.catalog.domain.ProductStatus;
 import com.example.storesaas.inventory.api.InventoryReservation;
 import com.example.storesaas.inventory.mapper.InventoryFlowMapper;
 import com.example.storesaas.catalog.mapper.ProductMapper;

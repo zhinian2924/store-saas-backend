@@ -1,4 +1,4 @@
-package com.example.storesaas.common.constants;
+package com.example.storesaas.platform.error;
 
 public final class ResultCode {
     public static final int SUCCESS = 200;

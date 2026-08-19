@@ -9,7 +9,7 @@ import com.example.storesaas.identity.auth.dto.AccountProfileUpdateDTO;
 import com.example.storesaas.identity.auth.dto.RegisterTenantDTO;
 import com.example.storesaas.identity.auth.dto.SmsCodeDTO;
 import com.example.storesaas.identity.auth.vo.SmsCodeVO;
-import com.example.storesaas.common.ApiResponse;
+import com.example.storesaas.platform.web.ApiResponse;
 import com.example.storesaas.identity.security.AccountType;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;

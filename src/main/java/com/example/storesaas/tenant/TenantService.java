@@ -1,9 +1,9 @@
 package com.example.storesaas.tenant;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.CommonStatus;
-import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.model.EnableStatus;
+import com.example.storesaas.platform.persistence.DeleteStatus;
 import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.tenant.store.entity.Store;
 import com.example.storesaas.tenant.store.mapper.StoreMapper;
@@ -93,7 +93,7 @@ public class TenantService {
                 .eq(SysUser::getAccountType, AccountType.STORE.name())
                 .eq(SysUser::getDeleted, DeleteStatus.NOT_DELETED));
         for (SysUser user : storeUsers) {
-            user.setStatus(CommonStatus.ENABLED);
+            user.setStatus(EnableStatus.ENABLED);
             user.setUpdatedAt(now);
             sysUserMapper.updateById(user);
         }

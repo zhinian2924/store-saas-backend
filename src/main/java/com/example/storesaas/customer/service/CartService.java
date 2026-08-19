@@ -1,8 +1,8 @@
 package com.example.storesaas.customer.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.DeleteStatus;
+import com.example.storesaas.platform.error.BusinessException;
+import com.example.storesaas.platform.persistence.DeleteStatus;
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.customer.dto.CartItemDTO;
 import com.example.storesaas.customer.entity.CartItem;

@@ -1,6 +1,6 @@
 package com.example.storesaas.mini.service;
 
-import com.example.storesaas.common.BusinessException;
+import com.example.storesaas.platform.error.BusinessException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
