@@ -6,7 +6,7 @@ import com.example.storesaas.platform.persistence.DeleteStatus;
 import com.example.storesaas.customer.CustomerContext;
 import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.mapper.StoreOrderMapper;
-import com.example.storesaas.mini.vo.MiniOrderVO;
+import com.example.storesaas.order.vo.MiniOrderVO;
 import com.example.storesaas.payment.PaymentService;
 import org.springframework.stereotype.Service;
 

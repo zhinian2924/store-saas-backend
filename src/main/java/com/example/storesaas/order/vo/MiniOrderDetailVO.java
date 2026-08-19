@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.vo;
+package com.example.storesaas.order.vo;
 
 import java.util.List;
 

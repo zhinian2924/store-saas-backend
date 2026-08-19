@@ -1,17 +1,17 @@
-package com.example.storesaas.mini.service;
+package com.example.storesaas.order.application;
 
 import com.example.storesaas.platform.error.BusinessException;
 import com.example.storesaas.platform.persistence.DeleteStatus;
 import com.example.storesaas.order.domain.OrderStatus;
 import com.example.storesaas.customer.CustomerContext;
-import com.example.storesaas.mini.dto.MiniOrderDTO;
+import com.example.storesaas.order.dto.MiniOrderDTO;
 import com.example.storesaas.customer.entity.CustomerAddress;
 import com.example.storesaas.customer.vo.AddressVO;
 import com.example.storesaas.customer.service.AddressService;
-import com.example.storesaas.mini.vo.MiniOrderDetailVO;
-import com.example.storesaas.mini.vo.MiniOrderItemVO;
-import com.example.storesaas.mini.vo.MiniOrderVO;
-import com.example.storesaas.mini.vo.OrderPreviewVO;
+import com.example.storesaas.order.vo.MiniOrderDetailVO;
+import com.example.storesaas.order.vo.MiniOrderItemVO;
+import com.example.storesaas.order.vo.MiniOrderVO;
+import com.example.storesaas.order.vo.OrderPreviewVO;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.domain.OrderRepository;
