@@ -1,9 +1,9 @@
 package com.example.storesaas.interfaces.mini;
 
 import com.example.storesaas.platform.web.ApiResponse;
-import com.example.storesaas.mini.dto.MockLoginDTO;
-import com.example.storesaas.mini.service.MiniAuthService;
-import com.example.storesaas.mini.vo.MiniLoginVO;
+import com.example.storesaas.identity.auth.dto.MockLoginDTO;
+import com.example.storesaas.identity.auth.MiniAuthService;
+import com.example.storesaas.identity.auth.vo.MiniLoginVO;
 import jakarta.validation.Valid;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.PostMapping;

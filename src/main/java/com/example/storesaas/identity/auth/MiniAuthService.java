@@ -1,4 +1,6 @@
-package com.example.storesaas.mini.service;
+package com.example.storesaas.identity.auth;
+
+import com.example.storesaas.miniapp.infrastructure.WechatClient;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
@@ -9,12 +11,12 @@ import com.example.storesaas.platform.model.EnableStatus;
 import com.example.storesaas.platform.error.ResultCode;
 import com.example.storesaas.customer.entity.Customer;
 import com.example.storesaas.customer.mapper.CustomerMapper;
-import com.example.storesaas.mini.dto.WechatLoginDTO;
-import com.example.storesaas.mini.vo.MiniLoginVO;
+import com.example.storesaas.identity.auth.dto.WechatLoginDTO;
+import com.example.storesaas.identity.auth.vo.MiniLoginVO;
 import com.example.storesaas.miniapp.MiniappConfigService;
 import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.identity.security.LoginUser;
-import com.example.storesaas.mini.dto.MockLoginDTO;
+import com.example.storesaas.identity.auth.dto.MockLoginDTO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import org.springframework.stereotype.Service;

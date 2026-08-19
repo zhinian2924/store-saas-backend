@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.vo;
+package com.example.storesaas.identity.auth.vo;
 
 import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.identity.security.LoginUser;

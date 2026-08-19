@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.service;
+package com.example.storesaas.miniapp.infrastructure;
 
 import com.example.storesaas.platform.error.BusinessException;
 import com.fasterxml.jackson.core.JsonProcessingException;
