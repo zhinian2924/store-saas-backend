@@ -12,8 +12,8 @@ import com.example.storesaas.mini.vo.PublicStoreVO;
 import com.example.storesaas.mini.vo.PublicCategoryVO;
 import com.example.storesaas.mini.vo.PublicProductVO;
 import com.example.storesaas.miniapp.MiniappConfigService;
-import com.example.storesaas.store.entity.Store;
-import com.example.storesaas.store.mapper.StoreMapper;
+import com.example.storesaas.tenant.store.entity.Store;
+import com.example.storesaas.tenant.store.mapper.StoreMapper;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

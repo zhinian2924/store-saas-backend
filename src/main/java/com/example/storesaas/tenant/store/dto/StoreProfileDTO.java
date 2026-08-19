@@ -1,4 +1,4 @@
-package com.example.storesaas.store.dto;
+package com.example.storesaas.tenant.store.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

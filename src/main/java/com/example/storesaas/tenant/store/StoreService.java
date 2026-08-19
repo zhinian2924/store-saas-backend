@@ -1,14 +1,14 @@
-package com.example.storesaas.store;
+package com.example.storesaas.tenant.store;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.media.MinioStorageService;
 import com.example.storesaas.security.AuthContext;
-import com.example.storesaas.store.dto.StoreProfileDTO;
-import com.example.storesaas.store.entity.Store;
-import com.example.storesaas.store.mapper.StoreMapper;
-import com.example.storesaas.store.vo.StoreVO;
+import com.example.storesaas.tenant.store.dto.StoreProfileDTO;
+import com.example.storesaas.tenant.store.entity.Store;
+import com.example.storesaas.tenant.store.mapper.StoreMapper;
+import com.example.storesaas.tenant.store.vo.StoreVO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import org.springframework.stereotype.Service;

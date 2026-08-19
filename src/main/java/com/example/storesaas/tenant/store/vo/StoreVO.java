@@ -1,6 +1,6 @@
-package com.example.storesaas.store.vo;
+package com.example.storesaas.tenant.store.vo;
 
-import com.example.storesaas.store.entity.Store;
+import com.example.storesaas.tenant.store.entity.Store;
 
 import java.time.LocalDateTime;
 
