@@ -4,7 +4,6 @@ import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.BusinessConstants;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
-import com.example.storesaas.common.constants.PaymentStatus;
 import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.catalog.api.ProductReader;
 import com.example.storesaas.catalog.api.ProductSnapshot;
@@ -14,8 +13,7 @@ import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.vo.OrderItemVO;
 import com.example.storesaas.order.vo.OrderVO;
-import com.example.storesaas.payment.entity.PaymentOrder;
-import com.example.storesaas.payment.mapper.PaymentOrderMapper;
+import com.example.storesaas.payment.api.PaymentOrderCreator;
 import com.example.storesaas.security.AuthContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,12 +27,12 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final PaymentOrderMapper paymentOrderMapper;
+    private final PaymentOrderCreator paymentOrderCreator;
     private final ProductReader productReader;
 
-    public OrderService(OrderRepository orderRepository, PaymentOrderMapper paymentOrderMapper, ProductReader productReader) {
+    public OrderService(OrderRepository orderRepository, PaymentOrderCreator paymentOrderCreator, ProductReader productReader) {
         this.orderRepository = orderRepository;
-        this.paymentOrderMapper = paymentOrderMapper;
+        this.paymentOrderCreator = paymentOrderCreator;
         this.productReader = productReader;
     }
 
@@ -76,15 +74,7 @@ public class OrderService {
             orderRepository.saveItem(item);
         }
 
-        PaymentOrder paymentOrder = new PaymentOrder();
-        paymentOrder.setTenantId(tenantId);
-        paymentOrder.setOrderId(order.getId());
-        paymentOrder.setPayNo(no(BusinessConstants.PAY_NO_PREFIX));
-        paymentOrder.setChannel(BusinessConstants.PAY_CHANNEL_MOCK);
-        paymentOrder.setStatus(PaymentStatus.WAITING);
-        paymentOrder.setAmount(total);
-        fill(paymentOrder);
-        paymentOrderMapper.insert(paymentOrder);
+        paymentOrderCreator.create(tenantId, order.getId(), total, BusinessConstants.PAY_CHANNEL_MOCK);
         return OrderVO.from(order);
     }
 
@@ -114,11 +104,6 @@ public class OrderService {
             item.setCreatedAt(now);
             item.setUpdatedAt(now);
             item.setDeleted(DeleteStatus.NOT_DELETED);
-        }
-        if (entity instanceof PaymentOrder paymentOrder) {
-            paymentOrder.setCreatedAt(now);
-            paymentOrder.setUpdatedAt(now);
-            paymentOrder.setDeleted(DeleteStatus.NOT_DELETED);
         }
     }
 }
