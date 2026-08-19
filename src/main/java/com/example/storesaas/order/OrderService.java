@@ -1,12 +1,9 @@
 package com.example.storesaas.order;
 
-import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.BusinessConstants;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
-import com.example.storesaas.common.constants.ProductStatus;
-import com.example.storesaas.catalog.api.ProductReader;
-import com.example.storesaas.catalog.api.ProductSnapshot;
+import com.example.storesaas.order.application.OrderPricingService;
 import com.example.storesaas.order.dto.CreateOrderDTO;
 import com.example.storesaas.order.domain.OrderRepository;
 import com.example.storesaas.order.entity.OrderItem;
@@ -28,28 +25,20 @@ import java.util.concurrent.ThreadLocalRandom;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final PaymentOrderCreator paymentOrderCreator;
-    private final ProductReader productReader;
+    private final OrderPricingService pricingService;
 
-    public OrderService(OrderRepository orderRepository, PaymentOrderCreator paymentOrderCreator, ProductReader productReader) {
+    public OrderService(OrderRepository orderRepository, PaymentOrderCreator paymentOrderCreator, OrderPricingService pricingService) {
         this.orderRepository = orderRepository;
         this.paymentOrderCreator = paymentOrderCreator;
-        this.productReader = productReader;
+        this.pricingService = pricingService;
     }
 
     @Transactional
     public OrderVO create(CreateOrderDTO request) {
         Long tenantId = AuthContext.tenantId();
-        BigDecimal total = BigDecimal.ZERO;
-        for (CreateOrderDTO.Item item : request.items()) {
-            ProductSnapshot product = productReader.getTenantProduct(tenantId, item.productId());
-            if (product.status() == null || product.status() != ProductStatus.ON_SALE) {
-                throw new BusinessException(product.name() + "当前不可销售");
-            }
-            if (product.stock() < item.quantity()) {
-                throw new BusinessException(product.name() + "库存不足");
-            }
-            total = total.add(product.price().multiply(BigDecimal.valueOf(item.quantity())));
-        }
+        OrderPricingService.PricingResult pricing = pricingService.price(tenantId,
+                request.items().stream().map(item -> new OrderPricingService.OrderLine(item.productId(), item.quantity())).toList());
+        BigDecimal total = pricing.total();
 
         StoreOrder order = new StoreOrder();
         order.setTenantId(tenantId);
@@ -60,16 +49,9 @@ public class OrderService {
         fill(order);
         orderRepository.saveOrder(order);
 
-        for (CreateOrderDTO.Item requestItem : request.items()) {
-            ProductSnapshot product = productReader.getTenantProduct(tenantId, requestItem.productId());
-            OrderItem item = new OrderItem();
+        for (OrderItem item : pricing.items()) {
             item.setTenantId(tenantId);
             item.setOrderId(order.getId());
-            item.setProductId(product.productId());
-            item.setProductName(product.name());
-            item.setPrice(product.price());
-            item.setQuantity(requestItem.quantity());
-            item.setAmount(product.price().multiply(BigDecimal.valueOf(requestItem.quantity())));
             fill(item);
             orderRepository.saveItem(item);
         }

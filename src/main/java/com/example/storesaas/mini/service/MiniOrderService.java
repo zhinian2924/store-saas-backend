@@ -3,9 +3,6 @@ package com.example.storesaas.mini.service;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
-import com.example.storesaas.common.constants.ProductStatus;
-import com.example.storesaas.catalog.api.ProductReader;
-import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.mini.dto.MiniOrderDTO;
 import com.example.storesaas.mini.entity.CustomerAddress;
@@ -17,6 +14,7 @@ import com.example.storesaas.mini.vo.OrderPreviewVO;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.domain.OrderRepository;
+import com.example.storesaas.order.application.OrderPricingService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +27,12 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class MiniOrderService {
     private final OrderRepository orderRepository;
-    private final ProductReader productReader;
+    private final OrderPricingService pricingService;
     private final AddressService addresses;
 
-    public MiniOrderService(OrderRepository orderRepository, ProductReader productReader, AddressService a) {
+    public MiniOrderService(OrderRepository orderRepository, OrderPricingService pricingService, AddressService a) {
         this.orderRepository = orderRepository;
-        this.productReader = productReader;
+        this.pricingService = pricingService;
         addresses = a;
     }
 
@@ -100,24 +98,9 @@ public class MiniOrderService {
     }
 
     private Calculation calculate(MiniOrderDTO r) {
-        BigDecimal total = BigDecimal.ZERO;
-        List<OrderItem> result = new ArrayList<>();
-        for (MiniOrderDTO.Item x : r.items()) {
-            ProductSnapshot p = productReader.getTenantProduct(CustomerContext.tenantId(), x.productId());
-            if (p.status() == null || p.status() != ProductStatus.ON_SALE) throw new BusinessException(p.name() + "当前不可销售");
-            if (p.stock() < x.quantity()) throw new BusinessException(p.name() + "库存不足");
-            OrderItem i = new OrderItem();
-            i.setTenantId(CustomerContext.tenantId());
-            i.setProductId(p.productId());
-            i.setProductName(p.name());
-            i.setImageUrl(p.imageUrl());
-            i.setPrice(p.price());
-            i.setQuantity(x.quantity());
-            i.setAmount(p.price().multiply(BigDecimal.valueOf(x.quantity())));
-            total = total.add(i.getAmount());
-            result.add(i);
-        }
-        return new Calculation(result, total);
+        OrderPricingService.PricingResult pricing = pricingService.price(CustomerContext.tenantId(),
+                r.items().stream().map(x -> new OrderPricingService.OrderLine(x.productId(), x.quantity())).toList());
+        return new Calculation(pricing.items(), pricing.total());
     }
 
     private BigDecimal deliveryFee(MiniOrderDTO r) {
