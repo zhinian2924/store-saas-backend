@@ -11,7 +11,7 @@ import com.example.storesaas.customer.entity.Customer;
 import com.example.storesaas.customer.mapper.CustomerMapper;
 import com.example.storesaas.mini.dto.WechatLoginDTO;
 import com.example.storesaas.mini.vo.MiniLoginVO;
-import com.example.storesaas.miniappconfig.MiniappConfigService;
+import com.example.storesaas.miniapp.MiniappConfigService;
 import com.example.storesaas.security.AccountType;
 import com.example.storesaas.security.LoginUser;
 import com.example.storesaas.mini.dto.MockLoginDTO;

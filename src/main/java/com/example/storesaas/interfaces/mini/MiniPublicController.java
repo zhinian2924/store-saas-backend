@@ -11,7 +11,7 @@ import com.example.storesaas.product.mapper.ProductMapper;
 import com.example.storesaas.mini.vo.PublicStoreVO;
 import com.example.storesaas.mini.vo.PublicCategoryVO;
 import com.example.storesaas.mini.vo.PublicProductVO;
-import com.example.storesaas.miniappconfig.MiniappConfigService;
+import com.example.storesaas.miniapp.MiniappConfigService;
 import com.example.storesaas.store.entity.Store;
 import com.example.storesaas.store.mapper.StoreMapper;
 import org.springframework.web.bind.annotation.*;

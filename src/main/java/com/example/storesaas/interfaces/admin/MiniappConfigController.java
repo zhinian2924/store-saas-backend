@@ -1,12 +1,12 @@
 package com.example.storesaas.interfaces.admin;
 
-import com.example.storesaas.miniappconfig.MiniappConfigService;
+import com.example.storesaas.miniapp.MiniappConfigService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;
-import com.example.storesaas.miniappconfig.dto.MiniappConfigDTO;
-import com.example.storesaas.miniappconfig.vo.MiniappConfigVO;
-import com.example.storesaas.miniappconfig.dto.MiniappConfigStatusDTO;
+import com.example.storesaas.miniapp.dto.MiniappConfigDTO;
+import com.example.storesaas.miniapp.vo.MiniappConfigVO;
+import com.example.storesaas.miniapp.dto.MiniappConfigStatusDTO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

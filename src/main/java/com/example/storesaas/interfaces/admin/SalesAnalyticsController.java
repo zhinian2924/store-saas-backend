@@ -1,6 +1,7 @@
 package com.example.storesaas.interfaces.admin;
 
 import com.example.storesaas.analytics.SalesAnalyticsService;
+import com.example.storesaas.analytics.SalesPeriod;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.analytics.vo.SalesOverviewVO;
 import com.example.storesaas.common.ApiResponse;

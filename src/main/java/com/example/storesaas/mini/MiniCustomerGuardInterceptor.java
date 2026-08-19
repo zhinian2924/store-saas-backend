@@ -1,6 +1,6 @@
 package com.example.storesaas.mini;
 
-import com.example.storesaas.miniappconfig.MiniappConfigService;
+import com.example.storesaas.miniapp.MiniappConfigService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
