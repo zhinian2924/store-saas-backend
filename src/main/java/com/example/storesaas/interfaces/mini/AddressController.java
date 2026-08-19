@@ -2,9 +2,9 @@ package com.example.storesaas.interfaces.mini;
 
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.mini.dto.AddressDTO;
+import com.example.storesaas.customer.dto.AddressDTO;
 import com.example.storesaas.customer.service.AddressService;
-import com.example.storesaas.mini.vo.AddressVO;
+import com.example.storesaas.customer.vo.AddressVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

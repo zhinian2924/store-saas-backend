@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.mini.CustomerContext;
-import com.example.storesaas.mini.dto.AddressDTO;
+import com.example.storesaas.customer.dto.AddressDTO;
 import com.example.storesaas.customer.entity.CustomerAddress;
 import com.example.storesaas.customer.mapper.CustomerAddressMapper;
-import com.example.storesaas.mini.vo.AddressVO;
+import com.example.storesaas.customer.vo.AddressVO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

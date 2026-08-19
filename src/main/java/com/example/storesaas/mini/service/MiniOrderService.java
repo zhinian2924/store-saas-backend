@@ -6,7 +6,7 @@ import com.example.storesaas.common.constants.OrderStatus;
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.mini.dto.MiniOrderDTO;
 import com.example.storesaas.customer.entity.CustomerAddress;
-import com.example.storesaas.mini.vo.AddressVO;
+import com.example.storesaas.customer.vo.AddressVO;
 import com.example.storesaas.customer.service.AddressService;
 import com.example.storesaas.mini.vo.MiniOrderDetailVO;
 import com.example.storesaas.mini.vo.MiniOrderItemVO;

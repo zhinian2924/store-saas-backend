@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.dto;
+package com.example.storesaas.customer.dto;
 
 import jakarta.validation.constraints.*;
 
