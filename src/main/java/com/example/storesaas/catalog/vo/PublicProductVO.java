@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.vo;
+package com.example.storesaas.catalog.vo;
 
 import com.example.storesaas.catalog.entity.Product;
 

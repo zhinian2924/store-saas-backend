@@ -5,7 +5,7 @@ import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.platform.web.ApiRoutes;
-import com.example.storesaas.mini.MiniCustomerGuardInterceptor;
+import com.example.storesaas.interfaces.mini.MiniCustomerGuardInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

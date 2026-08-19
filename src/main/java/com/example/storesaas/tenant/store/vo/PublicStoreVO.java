@@ -1,4 +1,4 @@
-package com.example.storesaas.mini.vo;
+package com.example.storesaas.tenant.store.vo;
 
 public record PublicStoreVO(
         String name,
