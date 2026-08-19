@@ -1,8 +1,9 @@
 package com.example.storesaas.interfaces.mini;
 
+import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.mini.dto.CartItemDTO;
-import com.example.storesaas.mini.service.CartService;
+import com.example.storesaas.customer.service.CartService;
 import com.example.storesaas.mini.vo.CartItemVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;

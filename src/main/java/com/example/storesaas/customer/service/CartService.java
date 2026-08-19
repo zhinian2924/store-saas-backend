@@ -1,12 +1,12 @@
-package com.example.storesaas.mini.service;
+package com.example.storesaas.customer.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.mini.dto.CartItemDTO;
-import com.example.storesaas.mini.entity.CartItem;
-import com.example.storesaas.mini.mapper.CartItemMapper;
+import com.example.storesaas.customer.entity.CartItem;
+import com.example.storesaas.customer.mapper.CartItemMapper;
 import com.example.storesaas.mini.vo.CartItemVO;
 import com.example.storesaas.product.ProductService;
 import com.example.storesaas.product.entity.Product;

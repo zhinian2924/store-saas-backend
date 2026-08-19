@@ -1,7 +1,7 @@
-package com.example.storesaas.mini.mapper;
+package com.example.storesaas.customer.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.storesaas.mini.entity.CustomerAddress;
+import com.example.storesaas.customer.entity.CustomerAddress;
 
 public interface CustomerAddressMapper extends BaseMapper<CustomerAddress> {
 }

@@ -1,6 +1,6 @@
 package com.example.storesaas.mini.vo;
 
-import com.example.storesaas.mini.entity.CustomerAddress;
+import com.example.storesaas.customer.entity.CustomerAddress;
 
 import java.time.LocalDateTime;
 
