@@ -1,4 +1,4 @@
-package com.example.storesaas.product.dto;
+package com.example.storesaas.catalog.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

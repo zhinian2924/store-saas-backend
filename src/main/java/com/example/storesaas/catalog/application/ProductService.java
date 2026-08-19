@@ -1,4 +1,4 @@
-package com.example.storesaas.product;
+package com.example.storesaas.catalog.application;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
@@ -8,14 +8,14 @@ import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.catalog.api.ProductReader;
 import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.media.MinioStorageService;
-import com.example.storesaas.product.dto.CategoryDTO;
-import com.example.storesaas.product.dto.ProductDTO;
-import com.example.storesaas.product.entity.Product;
-import com.example.storesaas.product.entity.ProductCategory;
-import com.example.storesaas.product.mapper.ProductCategoryMapper;
-import com.example.storesaas.product.mapper.ProductMapper;
-import com.example.storesaas.product.vo.CategoryVO;
-import com.example.storesaas.product.vo.ProductVO;
+import com.example.storesaas.catalog.dto.CategoryDTO;
+import com.example.storesaas.catalog.dto.ProductDTO;
+import com.example.storesaas.catalog.entity.Product;
+import com.example.storesaas.catalog.entity.ProductCategory;
+import com.example.storesaas.catalog.mapper.ProductCategoryMapper;
+import com.example.storesaas.catalog.mapper.ProductMapper;
+import com.example.storesaas.catalog.vo.CategoryVO;
+import com.example.storesaas.catalog.vo.ProductVO;
 import com.example.storesaas.security.AuthContext;
 import org.springframework.stereotype.Service;
 

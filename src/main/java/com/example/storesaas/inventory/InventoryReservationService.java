@@ -7,7 +7,7 @@ import com.example.storesaas.common.constants.InventoryFlowType;
 import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.inventory.api.InventoryReservation;
 import com.example.storesaas.inventory.mapper.InventoryFlowMapper;
-import com.example.storesaas.product.mapper.ProductMapper;
+import com.example.storesaas.catalog.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,6 @@
 package com.example.storesaas.mini.vo;
 
-import com.example.storesaas.product.entity.Product;
+import com.example.storesaas.catalog.entity.Product;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

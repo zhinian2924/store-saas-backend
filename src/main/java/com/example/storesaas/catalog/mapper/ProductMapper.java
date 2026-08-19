@@ -1,7 +1,7 @@
-package com.example.storesaas.product.mapper;
+package com.example.storesaas.catalog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.storesaas.product.entity.Product;
+import com.example.storesaas.catalog.entity.Product;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Update;
 

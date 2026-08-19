@@ -1,7 +1,7 @@
-package com.example.storesaas.product.mapper;
+package com.example.storesaas.catalog.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.example.storesaas.product.entity.ProductCategory;
+import com.example.storesaas.catalog.entity.ProductCategory;
 
 public interface ProductCategoryMapper extends BaseMapper<ProductCategory> {
 }

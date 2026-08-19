@@ -8,8 +8,8 @@ import com.example.storesaas.mini.dto.CartItemDTO;
 import com.example.storesaas.customer.entity.CartItem;
 import com.example.storesaas.customer.mapper.CartItemMapper;
 import com.example.storesaas.mini.vo.CartItemVO;
-import com.example.storesaas.product.ProductService;
-import com.example.storesaas.product.entity.Product;
+import com.example.storesaas.catalog.application.ProductService;
+import com.example.storesaas.catalog.entity.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

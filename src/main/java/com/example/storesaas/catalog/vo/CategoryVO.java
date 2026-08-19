@@ -1,6 +1,6 @@
-package com.example.storesaas.product.vo;
+package com.example.storesaas.catalog.vo;
 
-import com.example.storesaas.product.entity.ProductCategory;
+import com.example.storesaas.catalog.entity.ProductCategory;
 
 import java.time.LocalDateTime;
 

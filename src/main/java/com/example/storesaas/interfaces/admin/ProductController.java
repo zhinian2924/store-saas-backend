@@ -1,15 +1,15 @@
 package com.example.storesaas.interfaces.admin;
 
-import com.example.storesaas.product.ProductService;
+import com.example.storesaas.catalog.application.ProductService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;
-import com.example.storesaas.product.dto.CategoryDTO;
-import com.example.storesaas.product.dto.CategoryStatusDTO;
-import com.example.storesaas.product.dto.ProductDTO;
-import com.example.storesaas.product.dto.ProductStatusDTO;
-import com.example.storesaas.product.vo.CategoryVO;
-import com.example.storesaas.product.vo.ProductVO;
+import com.example.storesaas.catalog.dto.CategoryDTO;
+import com.example.storesaas.catalog.dto.CategoryStatusDTO;
+import com.example.storesaas.catalog.dto.ProductDTO;
+import com.example.storesaas.catalog.dto.ProductStatusDTO;
+import com.example.storesaas.catalog.vo.CategoryVO;
+import com.example.storesaas.catalog.vo.ProductVO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
