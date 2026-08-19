@@ -1,4 +1,4 @@
-package com.example.storesaas.mini;
+package com.example.storesaas.customer;
 
 import com.example.storesaas.platform.error.BusinessException;
 import com.example.storesaas.identity.security.AccountType;

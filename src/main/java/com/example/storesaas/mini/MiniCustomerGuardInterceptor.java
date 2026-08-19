@@ -1,5 +1,7 @@
 package com.example.storesaas.mini;
 
+import com.example.storesaas.customer.CustomerContext;
+
 import com.example.storesaas.miniapp.MiniappConfigService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
