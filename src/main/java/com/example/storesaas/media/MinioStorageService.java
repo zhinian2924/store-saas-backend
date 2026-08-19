@@ -1,7 +1,7 @@
 package com.example.storesaas.media;
 
 import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.security.AuthContext;
+import com.example.storesaas.identity.security.AuthContext;
 import io.minio.*;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

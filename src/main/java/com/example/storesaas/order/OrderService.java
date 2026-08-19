@@ -11,7 +11,7 @@ import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.vo.OrderItemVO;
 import com.example.storesaas.order.vo.OrderVO;
 import com.example.storesaas.payment.api.PaymentOrderCreator;
-import com.example.storesaas.security.AuthContext;
+import com.example.storesaas.identity.security.AuthContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

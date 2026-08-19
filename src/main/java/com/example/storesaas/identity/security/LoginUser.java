@@ -1,4 +1,4 @@
-package com.example.storesaas.security;
+package com.example.storesaas.identity.security;
 
 import java.io.Serializable;
 import java.util.List;

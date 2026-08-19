@@ -1,7 +1,6 @@
 package com.example.storesaas.interfaces.admin;
 
 import com.example.storesaas.auth.AuthService;
-import com.example.storesaas.auth.AuthService;
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.auth.dto.LoginDTO;
 import com.example.storesaas.auth.vo.LoginVO;
@@ -11,7 +10,7 @@ import com.example.storesaas.auth.dto.RegisterTenantDTO;
 import com.example.storesaas.auth.dto.SmsCodeDTO;
 import com.example.storesaas.auth.vo.SmsCodeVO;
 import com.example.storesaas.common.ApiResponse;
-import com.example.storesaas.security.AccountType;
+import com.example.storesaas.identity.security.AccountType;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

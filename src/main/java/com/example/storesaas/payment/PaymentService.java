@@ -12,7 +12,7 @@ import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.domain.OrderRepository;
 import com.example.storesaas.payment.entity.PaymentOrder;
 import com.example.storesaas.payment.mapper.PaymentOrderMapper;
-import com.example.storesaas.security.AuthContext;
+import com.example.storesaas.identity.security.AuthContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

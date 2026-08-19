@@ -1,4 +1,4 @@
-package com.example.storesaas.security;
+package com.example.storesaas.identity.security;
 
 /**
  * 账号类型

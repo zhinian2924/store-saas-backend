@@ -1,7 +1,7 @@
 package com.example.storesaas.mini.vo;
 
-import com.example.storesaas.security.AccountType;
-import com.example.storesaas.security.LoginUser;
+import com.example.storesaas.identity.security.AccountType;
+import com.example.storesaas.identity.security.LoginUser;
 
 import java.util.List;
 

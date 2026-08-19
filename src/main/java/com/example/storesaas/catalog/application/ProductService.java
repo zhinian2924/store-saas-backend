@@ -16,7 +16,7 @@ import com.example.storesaas.catalog.mapper.ProductCategoryMapper;
 import com.example.storesaas.catalog.mapper.ProductMapper;
 import com.example.storesaas.catalog.vo.CategoryVO;
 import com.example.storesaas.catalog.vo.ProductVO;
-import com.example.storesaas.security.AuthContext;
+import com.example.storesaas.identity.security.AuthContext;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

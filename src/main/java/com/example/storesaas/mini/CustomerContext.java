@@ -1,9 +1,9 @@
 package com.example.storesaas.mini;
 
 import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.security.AccountType;
-import com.example.storesaas.security.AuthContext;
-import com.example.storesaas.security.LoginUser;
+import com.example.storesaas.identity.security.AccountType;
+import com.example.storesaas.identity.security.AuthContext;
+import com.example.storesaas.identity.security.LoginUser;
 
 /**
  * Central guard for every mini-program endpoint.

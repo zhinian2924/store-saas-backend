@@ -5,7 +5,7 @@ import com.example.storesaas.mini.dto.WechatLoginDTO;
 import com.example.storesaas.mini.service.MiniAuthService;
 import com.example.storesaas.mini.vo.MiniCustomerVO;
 import com.example.storesaas.mini.vo.MiniLoginVO;
-import com.example.storesaas.security.AuthContext;
+import com.example.storesaas.identity.security.AuthContext;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 import cn.dev33.satoken.stp.StpUtil;

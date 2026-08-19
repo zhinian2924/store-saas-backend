@@ -12,7 +12,7 @@ import com.example.storesaas.inventory.mapper.InventoryFlowMapper;
 import com.example.storesaas.inventory.vo.InventoryFlowVO;
 import com.example.storesaas.catalog.entity.Product;
 import com.example.storesaas.catalog.mapper.ProductMapper;
-import com.example.storesaas.security.AuthContext;
+import com.example.storesaas.identity.security.AuthContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

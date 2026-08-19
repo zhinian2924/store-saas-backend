@@ -1,4 +1,4 @@
-package com.example.storesaas.security;
+package com.example.storesaas.identity.security;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.example.storesaas.common.BusinessException;

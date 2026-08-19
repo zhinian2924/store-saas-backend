@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
-import com.example.storesaas.security.AccountType;
+import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.tenant.store.entity.Store;
 import com.example.storesaas.tenant.store.mapper.StoreMapper;
 import com.example.storesaas.tenant.dto.TenantUpdateDTO;
