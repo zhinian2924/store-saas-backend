@@ -8,6 +8,7 @@ import com.example.storesaas.identity.security.AuthContext;
 import com.example.storesaas.tenant.store.dto.StoreProfileDTO;
 import com.example.storesaas.tenant.store.entity.Store;
 import com.example.storesaas.tenant.store.mapper.StoreMapper;
+import com.example.storesaas.tenant.store.vo.PublicStoreVO;
 import com.example.storesaas.tenant.store.vo.StoreVO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
@@ -30,6 +31,18 @@ public class StoreService {
 
     public StoreVO profile() {
         return StoreVO.from(currentStore());
+    }
+
+    public PublicStoreVO publicStore(Long tenantId) {
+        Store store = storeMapper.selectOne(new LambdaQueryWrapper<Store>()
+                .eq(Store::getTenantId, tenantId)
+                .eq(Store::getDeleted, DeleteStatus.NOT_DELETED)
+                .last("limit 1"));
+        if (store == null) {
+            return null;
+        }
+        return new PublicStoreVO(store.getName(), store.getLogoUrl(),
+                store.getThemeColor(), store.getBusinessHours());
     }
 
     @Transactional

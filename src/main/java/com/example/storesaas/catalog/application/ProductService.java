@@ -16,6 +16,8 @@ import com.example.storesaas.catalog.mapper.ProductCategoryMapper;
 import com.example.storesaas.catalog.mapper.ProductMapper;
 import com.example.storesaas.catalog.vo.CategoryVO;
 import com.example.storesaas.catalog.vo.ProductVO;
+import com.example.storesaas.catalog.vo.PublicCategoryVO;
+import com.example.storesaas.catalog.vo.PublicProductVO;
 import com.example.storesaas.identity.security.AuthContext;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +48,17 @@ public class ProductService implements ProductReader {
                 .orderByAsc(ProductCategory::getSortNo)).stream().map(CategoryVO::from).toList();
     }
 
+    public List<PublicCategoryVO> publicCategories(Long tenantId) {
+        return categoryMapper.selectList(new LambdaQueryWrapper<ProductCategory>()
+                .eq(ProductCategory::getTenantId, tenantId)
+                .eq(ProductCategory::getStatus, EnableStatus.ENABLED)
+                .eq(ProductCategory::getDeleted, DeleteStatus.NOT_DELETED)
+                .orderByAsc(ProductCategory::getSortNo))
+                .stream()
+                .map(PublicCategoryVO::from)
+                .toList();
+    }
+
     /**
      * 创建分类
      * @param request 分类请求
@@ -72,6 +85,21 @@ public class ProductService implements ProductReader {
                 .eq(Product::getTenantId, tenantId)
                 .eq(Product::getDeleted, DeleteStatus.NOT_DELETED)
                 .orderByDesc(Product::getId)).stream().map(ProductVO::from).toList();
+    }
+
+    public List<PublicProductVO> publicProducts(Long tenantId, Long categoryId) {
+        var query = new LambdaQueryWrapper<Product>()
+                .eq(Product::getTenantId, tenantId)
+                .eq(Product::getStatus, ProductStatus.ON_SALE)
+                .gt(Product::getStock, 0)
+                .eq(Product::getDeleted, DeleteStatus.NOT_DELETED);
+        if (categoryId != null) {
+            query.eq(Product::getCategoryId, categoryId);
+        }
+        return productMapper.selectList(query)
+                .stream()
+                .map(PublicProductVO::from)
+                .toList();
     }
 
     public ProductVO createProduct(ProductDTO request) {
