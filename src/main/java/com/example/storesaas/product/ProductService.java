@@ -157,6 +157,7 @@ public class ProductService implements ProductReader {
                 product.getId(),
                 product.getTenantId(),
                 product.getName(),
+                product.getImageUrl(),
                 product.getPrice(),
                 product.getStock(),
                 product.getStatus()

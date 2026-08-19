@@ -9,6 +9,7 @@ public record ProductSnapshot(
         Long productId,
         Long tenantId,
         String name,
+        String imageUrl,
         BigDecimal price,
         Integer stock,
         Integer status

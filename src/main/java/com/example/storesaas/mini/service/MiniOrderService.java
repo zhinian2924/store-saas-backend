@@ -3,6 +3,9 @@ package com.example.storesaas.mini.service;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
+import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.catalog.api.ProductReader;
+import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.mini.CustomerContext;
 import com.example.storesaas.mini.dto.MiniOrderDTO;
 import com.example.storesaas.mini.entity.CustomerAddress;
@@ -14,8 +17,6 @@ import com.example.storesaas.mini.vo.OrderPreviewVO;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
 import com.example.storesaas.order.domain.OrderRepository;
-import com.example.storesaas.product.ProductService;
-import com.example.storesaas.product.entity.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +29,12 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class MiniOrderService {
     private final OrderRepository orderRepository;
-    private final ProductService products;
+    private final ProductReader productReader;
     private final AddressService addresses;
 
-    public MiniOrderService(OrderRepository orderRepository, ProductService p, AddressService a) {
+    public MiniOrderService(OrderRepository orderRepository, ProductReader productReader, AddressService a) {
         this.orderRepository = orderRepository;
-        products = p;
+        this.productReader = productReader;
         addresses = a;
     }
 
@@ -102,17 +103,17 @@ public class MiniOrderService {
         BigDecimal total = BigDecimal.ZERO;
         List<OrderItem> result = new ArrayList<>();
         for (MiniOrderDTO.Item x : r.items()) {
-            Product p = products.tenantProduct(CustomerContext.tenantId(), x.productId());
-            if (p.getStatus() == null || p.getStatus() != 1) throw new BusinessException(p.getName() + "当前不可销售");
-            if (p.getStock() < x.quantity()) throw new BusinessException(p.getName() + "库存不足");
+            ProductSnapshot p = productReader.getTenantProduct(CustomerContext.tenantId(), x.productId());
+            if (p.status() == null || p.status() != ProductStatus.ON_SALE) throw new BusinessException(p.name() + "当前不可销售");
+            if (p.stock() < x.quantity()) throw new BusinessException(p.name() + "库存不足");
             OrderItem i = new OrderItem();
             i.setTenantId(CustomerContext.tenantId());
-            i.setProductId(p.getId());
-            i.setProductName(p.getName());
-            i.setImageUrl(p.getImageUrl());
-            i.setPrice(p.getPrice());
+            i.setProductId(p.productId());
+            i.setProductName(p.name());
+            i.setImageUrl(p.imageUrl());
+            i.setPrice(p.price());
             i.setQuantity(x.quantity());
-            i.setAmount(p.getPrice().multiply(BigDecimal.valueOf(x.quantity())));
+            i.setAmount(p.price().multiply(BigDecimal.valueOf(x.quantity())));
             total = total.add(i.getAmount());
             result.add(i);
         }
