@@ -1,16 +1,13 @@
 package com.example.storesaas.payment;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
-import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
 import com.example.storesaas.common.constants.PaymentStatus;
 import com.example.storesaas.inventory.api.InventoryReservation;
 import com.example.storesaas.inventory.api.InventoryReservation.ReservationItem;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
-import com.example.storesaas.order.mapper.OrderItemMapper;
-import com.example.storesaas.order.mapper.StoreOrderMapper;
+import com.example.storesaas.order.domain.OrderRepository;
 import com.example.storesaas.payment.entity.PaymentOrder;
 import com.example.storesaas.payment.mapper.PaymentOrderMapper;
 import com.example.storesaas.security.AuthContext;
@@ -23,25 +20,20 @@ import java.util.List;
 @Service
 public class PaymentService {
     private final PaymentOrderMapper paymentOrderMapper;
-    private final StoreOrderMapper orderMapper;
-    private final OrderItemMapper itemMapper;
+    private final OrderRepository orderRepository;
     private final InventoryReservation inventoryReservation;
 
-    public PaymentService(PaymentOrderMapper paymentOrderMapper, StoreOrderMapper orderMapper,
-                          OrderItemMapper itemMapper, InventoryReservation inventoryReservation) {
+    public PaymentService(PaymentOrderMapper paymentOrderMapper, OrderRepository orderRepository,
+                          InventoryReservation inventoryReservation) {
         this.paymentOrderMapper = paymentOrderMapper;
-        this.orderMapper = orderMapper;
-        this.itemMapper = itemMapper;
+        this.orderRepository = orderRepository;
         this.inventoryReservation = inventoryReservation;
     }
 
     @Transactional
     public StoreOrder mockPay(Long orderId) {
         Long tenantId = AuthContext.tenantId();
-        StoreOrder order = orderMapper.selectOne(new LambdaQueryWrapper<StoreOrder>()
-                .eq(StoreOrder::getTenantId, tenantId)
-                .eq(StoreOrder::getId, orderId)
-                .eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED));
+        StoreOrder order = orderRepository.findTenantOrder(tenantId, orderId);
         if (order == null) {
             throw new BusinessException("订单不存在");
         }
@@ -52,10 +44,7 @@ public class PaymentService {
             throw new BusinessException("订单状态不允许支付");
         }
 
-        List<OrderItem> items = itemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
-                .eq(OrderItem::getTenantId, tenantId)
-                .eq(OrderItem::getOrderId, orderId)
-                .eq(OrderItem::getDeleted, DeleteStatus.NOT_DELETED));
+        List<OrderItem> items = orderRepository.findTenantItems(tenantId, orderId);
         inventoryReservation.reserve(
                 tenantId,
                 orderId,
@@ -76,7 +65,7 @@ public class PaymentService {
         }
         order.setStatus(OrderStatus.PAID);
         order.setUpdatedAt(LocalDateTime.now());
-        orderMapper.updateById(order);
+        orderRepository.updateOrder(order);
         return order;
     }
 }

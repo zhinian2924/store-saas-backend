@@ -53,6 +53,14 @@ public class MyBatisOrderRepository implements OrderRepository {
     }
 
     @Override
+    public StoreOrder findTenantOrder(Long tenantId, Long orderId) {
+        return orderMapper.selectOne(new LambdaQueryWrapper<StoreOrder>()
+                .eq(StoreOrder::getTenantId, tenantId)
+                .eq(StoreOrder::getId, orderId)
+                .eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED));
+    }
+
+    @Override
     public StoreOrder findCustomerOrder(Long tenantId, Long customerId, Long orderId) {
         return orderMapper.selectOne(new LambdaQueryWrapper<StoreOrder>()
                 .eq(StoreOrder::getTenantId, tenantId)

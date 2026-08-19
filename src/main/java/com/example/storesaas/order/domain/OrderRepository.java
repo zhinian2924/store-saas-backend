@@ -16,5 +16,7 @@ public interface OrderRepository {
 
     List<OrderItem> findTenantItems(Long tenantId, Long orderId);
 
+    StoreOrder findTenantOrder(Long tenantId, Long orderId);
+
     StoreOrder findCustomerOrder(Long tenantId, Long customerId, Long orderId);
 }
