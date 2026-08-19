@@ -1,15 +1,15 @@
-package com.example.storesaas.auth;
+package com.example.storesaas.identity.auth;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.storesaas.auth.vo.AccountProfileVO;
-import com.example.storesaas.auth.dto.AccountProfileUpdateDTO;
-import com.example.storesaas.auth.dto.LoginDTO;
-import com.example.storesaas.auth.vo.LoginVO;
-import com.example.storesaas.auth.dto.RegisterTenantDTO;
-import com.example.storesaas.auth.dto.SmsCodeDTO;
-import com.example.storesaas.auth.vo.SmsCodeVO;
+import com.example.storesaas.identity.auth.vo.AccountProfileVO;
+import com.example.storesaas.identity.auth.dto.AccountProfileUpdateDTO;
+import com.example.storesaas.identity.auth.dto.LoginDTO;
+import com.example.storesaas.identity.auth.vo.LoginVO;
+import com.example.storesaas.identity.auth.dto.RegisterTenantDTO;
+import com.example.storesaas.identity.auth.dto.SmsCodeDTO;
+import com.example.storesaas.identity.auth.vo.SmsCodeVO;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.BusinessConstants;
 import com.example.storesaas.common.constants.CommonStatus;

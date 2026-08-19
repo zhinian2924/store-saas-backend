@@ -1,4 +1,4 @@
-package com.example.storesaas.auth.vo;
+package com.example.storesaas.identity.auth.vo;
 
 import java.util.List;
 

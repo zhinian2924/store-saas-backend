@@ -1,4 +1,4 @@
-package com.example.storesaas.auth.dto;
+package com.example.storesaas.identity.auth.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;

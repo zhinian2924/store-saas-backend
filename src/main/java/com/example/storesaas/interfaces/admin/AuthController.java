@@ -1,14 +1,14 @@
 package com.example.storesaas.interfaces.admin;
 
-import com.example.storesaas.auth.AuthService;
+import com.example.storesaas.identity.auth.AuthService;
 import cn.dev33.satoken.stp.StpUtil;
-import com.example.storesaas.auth.dto.LoginDTO;
-import com.example.storesaas.auth.vo.LoginVO;
-import com.example.storesaas.auth.vo.AccountProfileVO;
-import com.example.storesaas.auth.dto.AccountProfileUpdateDTO;
-import com.example.storesaas.auth.dto.RegisterTenantDTO;
-import com.example.storesaas.auth.dto.SmsCodeDTO;
-import com.example.storesaas.auth.vo.SmsCodeVO;
+import com.example.storesaas.identity.auth.dto.LoginDTO;
+import com.example.storesaas.identity.auth.vo.LoginVO;
+import com.example.storesaas.identity.auth.vo.AccountProfileVO;
+import com.example.storesaas.identity.auth.dto.AccountProfileUpdateDTO;
+import com.example.storesaas.identity.auth.dto.RegisterTenantDTO;
+import com.example.storesaas.identity.auth.dto.SmsCodeDTO;
+import com.example.storesaas.identity.auth.vo.SmsCodeVO;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.identity.security.AccountType;
 import jakarta.validation.Valid;
