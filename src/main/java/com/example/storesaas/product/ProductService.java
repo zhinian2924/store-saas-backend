@@ -5,6 +5,8 @@ import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.catalog.api.ProductReader;
+import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.media.MinioStorageService;
 import com.example.storesaas.product.dto.CategoryDTO;
 import com.example.storesaas.product.dto.ProductDTO;
@@ -21,7 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class ProductService {
+public class ProductService implements ProductReader {
     private final ProductCategoryMapper categoryMapper;
     private final ProductMapper productMapper;
     private final MinioStorageService storageService;
@@ -146,6 +148,19 @@ public class ProductService {
             throw new BusinessException("商品不存在");
         }
         return product;
+    }
+
+    @Override
+    public ProductSnapshot getTenantProduct(Long tenantId, Long productId) {
+        Product product = tenantProduct(tenantId, productId);
+        return new ProductSnapshot(
+                product.getId(),
+                product.getTenantId(),
+                product.getName(),
+                product.getPrice(),
+                product.getStock(),
+                product.getStatus()
+        );
     }
 
     private int normalizeProductStatus(Integer status, Integer stock) {

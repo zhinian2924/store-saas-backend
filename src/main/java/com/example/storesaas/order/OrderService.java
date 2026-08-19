@@ -7,6 +7,8 @@ import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
 import com.example.storesaas.common.constants.PaymentStatus;
 import com.example.storesaas.common.constants.ProductStatus;
+import com.example.storesaas.catalog.api.ProductReader;
+import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.order.dto.CreateOrderDTO;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
@@ -16,8 +18,6 @@ import com.example.storesaas.order.vo.OrderItemVO;
 import com.example.storesaas.order.vo.OrderVO;
 import com.example.storesaas.payment.entity.PaymentOrder;
 import com.example.storesaas.payment.mapper.PaymentOrderMapper;
-import com.example.storesaas.product.ProductService;
-import com.example.storesaas.product.entity.Product;
 import com.example.storesaas.security.AuthContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,13 +33,13 @@ public class OrderService {
     private final StoreOrderMapper orderMapper;
     private final OrderItemMapper itemMapper;
     private final PaymentOrderMapper paymentOrderMapper;
-    private final ProductService productService;
+    private final ProductReader productReader;
 
-    public OrderService(StoreOrderMapper orderMapper, OrderItemMapper itemMapper, PaymentOrderMapper paymentOrderMapper, ProductService productService) {
+    public OrderService(StoreOrderMapper orderMapper, OrderItemMapper itemMapper, PaymentOrderMapper paymentOrderMapper, ProductReader productReader) {
         this.orderMapper = orderMapper;
         this.itemMapper = itemMapper;
         this.paymentOrderMapper = paymentOrderMapper;
-        this.productService = productService;
+        this.productReader = productReader;
     }
 
     @Transactional
@@ -47,14 +47,14 @@ public class OrderService {
         Long tenantId = AuthContext.tenantId();
         BigDecimal total = BigDecimal.ZERO;
         for (CreateOrderDTO.Item item : request.items()) {
-            Product product = productService.tenantProduct(tenantId, item.productId());
-            if (product.getStatus() == null || product.getStatus() != ProductStatus.ON_SALE) {
-                throw new BusinessException(product.getName() + "当前不可销售");
+            ProductSnapshot product = productReader.getTenantProduct(tenantId, item.productId());
+            if (product.status() == null || product.status() != ProductStatus.ON_SALE) {
+                throw new BusinessException(product.name() + "当前不可销售");
             }
-            if (product.getStock() < item.quantity()) {
-                throw new BusinessException(product.getName() + "库存不足");
+            if (product.stock() < item.quantity()) {
+                throw new BusinessException(product.name() + "库存不足");
             }
-            total = total.add(product.getPrice().multiply(BigDecimal.valueOf(item.quantity())));
+            total = total.add(product.price().multiply(BigDecimal.valueOf(item.quantity())));
         }
 
         StoreOrder order = new StoreOrder();
@@ -67,15 +67,15 @@ public class OrderService {
         orderMapper.insert(order);
 
         for (CreateOrderDTO.Item requestItem : request.items()) {
-            Product product = productService.tenantProduct(tenantId, requestItem.productId());
+            ProductSnapshot product = productReader.getTenantProduct(tenantId, requestItem.productId());
             OrderItem item = new OrderItem();
             item.setTenantId(tenantId);
             item.setOrderId(order.getId());
-            item.setProductId(product.getId());
-            item.setProductName(product.getName());
-            item.setPrice(product.getPrice());
+            item.setProductId(product.productId());
+            item.setProductName(product.name());
+            item.setPrice(product.price());
             item.setQuantity(requestItem.quantity());
-            item.setAmount(product.getPrice().multiply(BigDecimal.valueOf(requestItem.quantity())));
+            item.setAmount(product.price().multiply(BigDecimal.valueOf(requestItem.quantity())));
             fill(item);
             itemMapper.insert(item);
         }
