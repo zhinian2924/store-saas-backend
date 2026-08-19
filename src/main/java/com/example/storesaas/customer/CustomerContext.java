@@ -6,7 +6,7 @@ import com.example.storesaas.identity.security.AuthContext;
 import com.example.storesaas.identity.security.LoginUser;
 
 /**
- * Central guard for every mini-program endpoint.
+ * 客户上下文
  */
 public final class CustomerContext {
     private CustomerContext() {
