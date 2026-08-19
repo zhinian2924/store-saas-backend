@@ -1,6 +1,5 @@
 package com.example.storesaas.order;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.BusinessConstants;
 import com.example.storesaas.common.constants.DeleteStatus;
@@ -10,10 +9,9 @@ import com.example.storesaas.common.constants.ProductStatus;
 import com.example.storesaas.catalog.api.ProductReader;
 import com.example.storesaas.catalog.api.ProductSnapshot;
 import com.example.storesaas.order.dto.CreateOrderDTO;
+import com.example.storesaas.order.domain.OrderRepository;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
-import com.example.storesaas.order.mapper.OrderItemMapper;
-import com.example.storesaas.order.mapper.StoreOrderMapper;
 import com.example.storesaas.order.vo.OrderItemVO;
 import com.example.storesaas.order.vo.OrderVO;
 import com.example.storesaas.payment.entity.PaymentOrder;
@@ -30,14 +28,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class OrderService {
-    private final StoreOrderMapper orderMapper;
-    private final OrderItemMapper itemMapper;
+    private final OrderRepository orderRepository;
     private final PaymentOrderMapper paymentOrderMapper;
     private final ProductReader productReader;
 
-    public OrderService(StoreOrderMapper orderMapper, OrderItemMapper itemMapper, PaymentOrderMapper paymentOrderMapper, ProductReader productReader) {
-        this.orderMapper = orderMapper;
-        this.itemMapper = itemMapper;
+    public OrderService(OrderRepository orderRepository, PaymentOrderMapper paymentOrderMapper, ProductReader productReader) {
+        this.orderRepository = orderRepository;
         this.paymentOrderMapper = paymentOrderMapper;
         this.productReader = productReader;
     }
@@ -64,7 +60,7 @@ public class OrderService {
         order.setStatus(OrderStatus.PENDING_PAY);
         order.setTotalAmount(total);
         fill(order);
-        orderMapper.insert(order);
+        orderRepository.saveOrder(order);
 
         for (CreateOrderDTO.Item requestItem : request.items()) {
             ProductSnapshot product = productReader.getTenantProduct(tenantId, requestItem.productId());
@@ -77,7 +73,7 @@ public class OrderService {
             item.setQuantity(requestItem.quantity());
             item.setAmount(product.price().multiply(BigDecimal.valueOf(requestItem.quantity())));
             fill(item);
-            itemMapper.insert(item);
+            orderRepository.saveItem(item);
         }
 
         PaymentOrder paymentOrder = new PaymentOrder();
@@ -94,18 +90,12 @@ public class OrderService {
 
     public List<OrderVO> list() {
         Long tenantId = AuthContext.tenantId();
-        return orderMapper.selectList(new LambdaQueryWrapper<StoreOrder>()
-                .eq(StoreOrder::getTenantId, tenantId)
-                .eq(StoreOrder::getDeleted, DeleteStatus.NOT_DELETED)
-                .orderByDesc(StoreOrder::getId)).stream().map(OrderVO::from).toList();
+        return orderRepository.findTenantOrders(tenantId).stream().map(OrderVO::from).toList();
     }
 
     public List<OrderItemVO> items(Long orderId) {
         Long tenantId = AuthContext.tenantId();
-        return itemMapper.selectList(new LambdaQueryWrapper<OrderItem>()
-                .eq(OrderItem::getTenantId, tenantId)
-                .eq(OrderItem::getOrderId, orderId)
-                .eq(OrderItem::getDeleted, DeleteStatus.NOT_DELETED)).stream().map(OrderItemVO::from).toList();
+        return orderRepository.findTenantItems(tenantId, orderId).stream().map(OrderItemVO::from).toList();
     }
 
     private String no(String prefix) {

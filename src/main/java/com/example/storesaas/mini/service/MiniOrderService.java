@@ -1,6 +1,5 @@
 package com.example.storesaas.mini.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.common.constants.OrderStatus;
@@ -14,8 +13,7 @@ import com.example.storesaas.mini.vo.MiniOrderVO;
 import com.example.storesaas.mini.vo.OrderPreviewVO;
 import com.example.storesaas.order.entity.OrderItem;
 import com.example.storesaas.order.entity.StoreOrder;
-import com.example.storesaas.order.mapper.OrderItemMapper;
-import com.example.storesaas.order.mapper.StoreOrderMapper;
+import com.example.storesaas.order.domain.OrderRepository;
 import com.example.storesaas.product.ProductService;
 import com.example.storesaas.product.entity.Product;
 import org.springframework.stereotype.Service;
@@ -29,14 +27,12 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class MiniOrderService {
-    private final StoreOrderMapper orders;
-    private final OrderItemMapper items;
+    private final OrderRepository orderRepository;
     private final ProductService products;
     private final AddressService addresses;
 
-    public MiniOrderService(StoreOrderMapper o, OrderItemMapper i, ProductService p, AddressService a) {
-        orders = o;
-        items = i;
+    public MiniOrderService(OrderRepository orderRepository, ProductService p, AddressService a) {
+        this.orderRepository = orderRepository;
         products = p;
         addresses = a;
     }
@@ -64,25 +60,24 @@ public class MiniOrderService {
         o.setSource("MINI");
         o.setAddressSnapshot(snapshot(r));
         fill(o);
-        orders.insert(o);
+        orderRepository.saveOrder(o);
         for (OrderItem i : c.items) {
             i.setOrderId(o.getId());
             fill(i);
-            items.insert(i);
+            orderRepository.saveItem(i);
         }
         return MiniOrderVO.from(o);
     }
 
     public List<MiniOrderVO> list() {
-        return orders.selectList(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTenantId, CustomerContext.tenantId()).eq(StoreOrder::getCustomerId, CustomerContext.customerId()).eq(StoreOrder::getDeleted, 0).orderByDesc(StoreOrder::getId))
-                .stream().map(MiniOrderVO::from).toList();
+        return orderRepository.findTenantOrders(CustomerContext.tenantId()).stream()
+                .filter(order -> Objects.equals(order.getCustomerId(), CustomerContext.customerId()))
+                .map(MiniOrderVO::from).toList();
     }
 
     public MiniOrderDetailVO detail(Long id) {
         StoreOrder o = owned(id);
-        List<MiniOrderItemVO> orderItems = items.selectList(new LambdaQueryWrapper<OrderItem>()
-                        .eq(OrderItem::getTenantId, CustomerContext.tenantId())
-                        .eq(OrderItem::getOrderId, id).eq(OrderItem::getDeleted, 0))
+        List<MiniOrderItemVO> orderItems = orderRepository.findTenantItems(CustomerContext.tenantId(), id)
                 .stream().map(MiniOrderItemVO::from).toList();
         return new MiniOrderDetailVO(MiniOrderVO.from(o), orderItems);
     }
@@ -93,12 +88,12 @@ public class MiniOrderService {
         if (!OrderStatus.PENDING_PAY.equals(o.getStatus())) throw new BusinessException("当前订单不可取消");
         o.setStatus(OrderStatus.CANCELLED);
         o.setUpdatedAt(LocalDateTime.now());
-        orders.updateById(o);
+        orderRepository.updateOrder(o);
         return MiniOrderVO.from(o);
     }
 
     private StoreOrder owned(Long id) {
-        StoreOrder o = orders.selectOne(new LambdaQueryWrapper<StoreOrder>().eq(StoreOrder::getTenantId, CustomerContext.tenantId()).eq(StoreOrder::getCustomerId, CustomerContext.customerId()).eq(StoreOrder::getId, id).eq(StoreOrder::getDeleted, 0));
+        StoreOrder o = orderRepository.findCustomerOrder(CustomerContext.tenantId(), CustomerContext.customerId(), id);
         if (o == null) throw new BusinessException("订单不存在");
         return o;
     }
