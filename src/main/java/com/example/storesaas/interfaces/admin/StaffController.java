@@ -1,13 +1,13 @@
 package com.example.storesaas.interfaces.admin;
 
-import com.example.storesaas.user.StaffService;
+import com.example.storesaas.identity.user.StaffService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.example.storesaas.common.ApiResponse;
 import com.example.storesaas.common.constants.Permissions;
-import com.example.storesaas.user.dto.StaffCreateDTO;
-import com.example.storesaas.user.dto.StaffStatusDTO;
-import com.example.storesaas.user.vo.StaffVO;
-import com.example.storesaas.user.dto.StaffUpdateDTO;
+import com.example.storesaas.identity.user.dto.StaffCreateDTO;
+import com.example.storesaas.identity.user.dto.StaffStatusDTO;
+import com.example.storesaas.identity.user.vo.StaffVO;
+import com.example.storesaas.identity.user.dto.StaffUpdateDTO;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -11,8 +11,8 @@ import com.example.storesaas.tenant.dto.TenantUpdateDTO;
 import com.example.storesaas.tenant.entity.Tenant;
 import com.example.storesaas.tenant.mapper.TenantMapper;
 import com.example.storesaas.tenant.vo.TenantVO;
-import com.example.storesaas.user.entity.SysUser;
-import com.example.storesaas.user.mapper.SysUserMapper;
+import com.example.storesaas.identity.user.entity.SysUser;
+import com.example.storesaas.identity.user.mapper.SysUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

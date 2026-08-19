@@ -1,4 +1,4 @@
-package com.example.storesaas.user;
+package com.example.storesaas.identity.user;
 
 /**
  * 员工角色

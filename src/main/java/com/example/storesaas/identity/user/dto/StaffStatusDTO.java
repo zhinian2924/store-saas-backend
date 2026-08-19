@@ -1,4 +1,4 @@
-package com.example.storesaas.user.dto;
+package com.example.storesaas.identity.user.dto;
 
 import jakarta.validation.constraints.NotNull;
 

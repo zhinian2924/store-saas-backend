@@ -1,7 +1,7 @@
-package com.example.storesaas.user.vo;
+package com.example.storesaas.identity.user.vo;
 
-import com.example.storesaas.user.StaffPermissions;
-import com.example.storesaas.user.entity.SysUser;
+import com.example.storesaas.identity.user.StaffPermissions;
+import com.example.storesaas.identity.user.entity.SysUser;
 
 import java.time.LocalDateTime;
 import java.util.List;

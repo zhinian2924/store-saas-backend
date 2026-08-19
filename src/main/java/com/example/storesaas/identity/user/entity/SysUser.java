@@ -1,4 +1,4 @@
-package com.example.storesaas.user.entity;
+package com.example.storesaas.identity.user.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.storesaas.common.BaseEntity;

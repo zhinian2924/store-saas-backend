@@ -1,4 +1,4 @@
-package com.example.storesaas.user;
+package com.example.storesaas.identity.user;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.storesaas.common.BusinessException;
@@ -6,11 +6,11 @@ import com.example.storesaas.common.constants.CommonStatus;
 import com.example.storesaas.common.constants.DeleteStatus;
 import com.example.storesaas.identity.security.AccountType;
 import com.example.storesaas.identity.security.AuthContext;
-import com.example.storesaas.user.dto.StaffCreateDTO;
-import com.example.storesaas.user.vo.StaffVO;
-import com.example.storesaas.user.dto.StaffUpdateDTO;
-import com.example.storesaas.user.entity.SysUser;
-import com.example.storesaas.user.mapper.SysUserMapper;
+import com.example.storesaas.identity.user.dto.StaffCreateDTO;
+import com.example.storesaas.identity.user.vo.StaffVO;
+import com.example.storesaas.identity.user.dto.StaffUpdateDTO;
+import com.example.storesaas.identity.user.entity.SysUser;
+import com.example.storesaas.identity.user.mapper.SysUserMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

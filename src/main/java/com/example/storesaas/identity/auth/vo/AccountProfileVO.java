@@ -1,7 +1,7 @@
 package com.example.storesaas.identity.auth.vo;
 
-import com.example.storesaas.user.StaffPermissions;
-import com.example.storesaas.user.entity.SysUser;
+import com.example.storesaas.identity.user.StaffPermissions;
+import com.example.storesaas.identity.user.entity.SysUser;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.example.storesaas.user;
+package com.example.storesaas.identity.user;
 
 import com.example.storesaas.common.constants.Permissions;
 
